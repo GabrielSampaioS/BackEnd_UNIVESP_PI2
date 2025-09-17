@@ -31,10 +31,7 @@ app.use('/clientes', clienteRoutes);
 // =======================
 const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/barDaFilo';
 
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(uri)
 .then(() => {
   console.log('Conectado ao MongoDB com sucesso!');
   const PORT = process.env.PORT || 3001;
