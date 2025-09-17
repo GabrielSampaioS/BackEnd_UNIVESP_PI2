@@ -12,7 +12,7 @@ const {
 router.post('/', criarCliente);
 router.get('/localizar', localizarClientes);
 
-//trazer historico
+//trazer historico e o saldo
 router.get('/historico', obterHistorico);
 
 //Atulizar valores

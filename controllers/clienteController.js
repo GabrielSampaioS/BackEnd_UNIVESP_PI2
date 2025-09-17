@@ -21,35 +21,65 @@ async function criarCliente(req, res) {
 }
 
 // Localizar clientes por nome
+
 async function localizarClientes(req, res) {
   try {
-    const { nome } = req.query;
-    if (!nome) return res.json([]);
+    const { nome, cpf } = req.query;
+    if (!nome && !cpf) return res.json([]);
 
-    const clientes = await Event.find({
-      event_type: 'ClienteCadastrado',
-      'event_data.nome': { $regex: nome, $options: 'i' }
-    });
+    let query = { event_type: 'ClienteCadastrado' };
 
-    res.json(clientes);
+    if (nome && cpf) {
+      // Filtro "E"
+      query['event_data.nome'] = { $regex: nome, $options: 'i' };
+      query['event_data.cpf'] = { $regex: cpf, $options: 'i' };
+    } else if (nome || cpf) {
+      // Filtro "OU"
+      query.$or = [];
+      if (nome) query.$or.push({ 'event_data.nome': { $regex: nome, $options: 'i' } });
+      if (cpf) query.$or.push({ 'event_data.cpf': { $regex: cpf, $options: 'i' } });
+    }
+
+    const clientesCadastrados = await Event.find(query);
+
+    res.json(clientesCadastrados);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao localizar clientes' });
   }
 }
+// ...existing code...
 
 // Obter histórico completo
 async function obterHistorico(req, res) {
   try {
     const { aggregate_id } = req.query;
-    console.log(aggregate_id)
     if (!aggregate_id) return res.status(400).json({ error: 'aggregate_id obrigatório' });
 
     const eventos = await Event.find({ aggregate_id }).sort({ created_at: 1 });
-    res.json(eventos);
+    
+    //Calcular saldo
+    let saldo = 0
+    eventos.forEach(eventos => {
+      if(eventos.event_type === 'DividaRegistrada'){ // transformar esse em enum type
+        saldo -= Number(eventos.event_data.valor);
+      }
+      if(eventos.event_type === 'PagamentoEfetuado'){
+        saldo += Number(eventos.event_data.valor)
+      }
+    })
+    console.log(saldo)
+    
+    res.json({
+      historico: eventos,
+      saldo: saldo
+      }
+    );
   } catch (err) {
     res.status(500).json({ error: 'Erro ao obter histórico do cliente' });
   }
 }
+
+
 
 // Registrar dívida //Criar o controleer e model separado ?
 async function registrarDivida(req, res) {
