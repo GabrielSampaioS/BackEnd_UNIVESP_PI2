@@ -1,9 +1,3 @@
-Abaixo está um **README completo em texto** para o seu projeto.
-Ele explica **arquitetura, fluxo, decisões técnicas e funcionamento interno**.
-Você pode **copiar direto para o GitHub ou enviar para outras LLMs**.
-
----
-
 # Bar da Filó — API de Controle de Fiado (Event Sourcing + DDD)
 
 ## Visão Geral
@@ -323,159 +317,15 @@ Controller->>MongoDB: buscar eventos
 MongoDB-->>Controller: lista eventos
 Controller-->>Client: historico + saldo
 ```
+# Visão Geral dos Endpoints
 
-## 1 Criar Cliente
-
-Endpoint:
-
-```
-POST /clientes
-```
-
-Body:
-
-```
-{
-  nome
-  sobrenome
-  telefone
-  cpf
-  email
-}
-```
-
-Fluxo interno:
-
-```
-Controller
- → gera UUID
- → cria evento ClienteCadastrado
- → salva no banco
- → retorna aggregate_id
-```
-
-Evento criado:
-
-```
-ClienteCadastrado
-```
-
----
-
-## 2 Localizar Cliente
-
-Endpoint:
-
-```
-GET /clientes/localizar
-```
-
-Query params:
-
-```
-nome
-cpf
-```
-
-Fluxo:
-
-```
-controller
- → consulta eventos ClienteCadastrado
- → aplica filtro
- → retorna resultados
-```
-
----
-
-## 3 Registrar Dívida
-
-Endpoint:
-
-```
-POST /clientes/divida
-```
-
-Body:
-
-```
-{
-  aggregate_id
-  valor
-}
-```
-
-Fluxo:
-
-```
-controller
- → cria evento DividaRegistrada
- → salva no banco
-```
-
----
-
-## 4 Registrar Pagamento
-
-Endpoint:
-
-```
-POST /clientes/pagamento
-```
-
-Body:
-
-```
-{
-  aggregate_id
-  valor
-}
-```
-
-Fluxo:
-
-```
-controller
- → cria evento PagamentoEfetuado
- → salva no banco
-```
-
----
-
-## 5 Consultar Histórico
-
-Endpoint:
-
-```
-GET /clientes/historico
-```
-
-Query:
-
-```
-aggregate_id
-```
-
-Fluxo:
-
-```
-controller
- → busca eventos do cliente
- → ordena por data
- → calcula saldo
- → retorna histórico + saldo
-```
-
-Resposta:
-
-```
-{
-  historico: [eventos],
-  saldo: number
-}
-```
-
----
+| Ação                     | Endpoint                     | Corpo / Query                 | Evento / Ação Interna                                           |
+|---------------------------|-----------------------------|-------------------------------|-----------------------------------------------------------------|
+| Criar Cliente             | `POST /clientes`            | `{ nome, sobrenome, telefone, cpf, email }` | Gera UUID, cria `ClienteCadastrado`, salva                     |
+| Localizar Cliente         | `GET /clientes/localizar`   | `nome`, `cpf`                 | Consulta `ClienteCadastrado`, retorna resultados filtrados      |
+| Registrar Dívida          | `POST /clientes/divida`     | `aggregate_id, {valor}`      | Cria `DividaRegistrada`, salva                                   |
+| Registrar Pagamento       | `POST /clientes/pagamento`  | `aggregate_id, {valor }`      | Cria `PagamentoEfetuado`, salva                                  |
+| Consultar Histórico       | `GET /clientes/historico`   | `aggregate_id`                 | Busca todos eventos do cliente, calcula saldo e retorna histórico |
 
 # Banco de Dados
 
@@ -585,24 +435,3 @@ Garantir tipagem forte no TypeScript.
 
 ---
 
-# Conclusão
-
-Este projeto demonstra a implementação de:
-
-* Event Sourcing
-* Arquitetura em camadas
-* DDD
-* API REST
-* Node.js com TypeScript
-
-Mesmo sendo um sistema simples de controle de fiado, ele foi estruturado utilizando conceitos arquiteturais aplicados em **sistemas financeiros reais**.
-
-A arquitetura permite:
-
-* rastreabilidade completa
-* evolução segura
-* manutenção facilitada
-
----
-
-Se quiser, posso também montar uma **versão ainda mais forte para GitHub (com diagramas de arquitetura e fluxo de eventos)** que deixa o projeto **muito mais profissional para portfólio**.
