@@ -1,11 +1,16 @@
 // =======================
 // Importação de módulos
 // ======================= 
+
+// Não usar "/../src/..."
+// Funciona no TS, mas após o build a pasta "src" não existe mais (vira dist).
+// Use caminhos relativos: "./interfaces/..."
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv"
-import clienteRoutes from "../src/interfaces/routes/clientes"
-import { connectDatabase } from "../src/infrastructure/database/mongoose"
+import clienteRoutes from "./interfaces/routes/clientes"
+import { connectDatabase } from "./infrastructure/database/mongoose"
 dotenv.config()
 
 // =======================
