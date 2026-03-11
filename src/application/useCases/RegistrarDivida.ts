@@ -7,7 +7,7 @@ export class RegistrarDivida {
     async execute(aggregate_id: String, valor: number){
         const event = {
             aggregate_id,
-            EventTypes: EventTypes.DIVIDA_REGISTRADA,
+            event_type: EventTypes.DIVIDA_REGISTRADA,
             event_data: {valor}
         }
 

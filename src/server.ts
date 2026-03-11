@@ -26,7 +26,7 @@ app.use(express.json())
 // Importação das rotas
 // =======================
 
-app.use("/clientes", clienteRoutes)
+app.use("/", clienteRoutes)
 
 // =======================
 // Iniciando aplicacão

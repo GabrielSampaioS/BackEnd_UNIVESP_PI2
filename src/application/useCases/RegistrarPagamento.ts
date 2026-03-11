@@ -7,7 +7,7 @@ export class RegistrarPagamento  {
     async execute(aggregate_id: String, valor: number){
         const event = {
             aggregate_id,
-            EventTypes: EventTypes.PAGAMENTO_EFETUADO,
+            event_type: EventTypes.PAGAMENTO_EFETUADO,
             event_data: {valor}
         }
 

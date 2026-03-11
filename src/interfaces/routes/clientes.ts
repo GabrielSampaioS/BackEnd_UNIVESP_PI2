@@ -6,14 +6,15 @@ import {
   registrarPagamento,
   obterHistorico
 } from "../controllers/ClienteController"
+
 const router = express.Router()
 
-router.post("/", criarCliente)
+router.post("/clientes", criarCliente)
 
-router.post("/divida", registrarDivida)
+router.post("/clientes/:id/dividas", registrarDivida)
 
-router.post("/pagamento", registrarPagamento)
+router.post("/clientes/:id/pagamentos", registrarPagamento)
 
-router.get("/historico", obterHistorico)
+router.get("/clientes/:id/eventos", obterHistorico)
 
 export default router

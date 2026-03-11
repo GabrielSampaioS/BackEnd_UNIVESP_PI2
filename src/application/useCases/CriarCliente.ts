@@ -10,8 +10,14 @@ export class CriarCliente{
 
         const event = {
             aggregate_id,
-            EventTypes: EventTypes.CLIENTE_CADASTRADO,
-            event_data: data
+            event_type: EventTypes.CLIENTE_CADASTRADO,
+            event_data: {
+                nome: data.nome,
+                sobrenome: data.sobrenome,
+                telefone: data.telefone,
+                cpf: data.cpf,
+                email: data.email
+            }
         }
 
         await this.repository.save(event)

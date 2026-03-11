@@ -15,42 +15,51 @@ export async function criarCliente(req: Request, res: Response) {
 
   const aggregate_id = await usecase.execute(req.body)
 
-  res.json({ aggregate_id })
+   return res.status(201).json({
+    message: "Cliente criado",
+    id: aggregate_id
+  })
 
 }
 
 export async function registrarDivida(req: Request, res: Response) {
 
-  const { aggregate_id, valor } = req.body
+  const { id } = req.params
+  const { valor } = req.body
 
   const usecase = new RegistrarDivida(repository)
 
-  await usecase.execute(aggregate_id, valor)
+  //teste
+  await usecase.execute(id[0], valor)
 
-  res.json({ message: "Divida registrada" })
-
+  return res.status(201).json({
+    message: "Divida registrada"
+  })
 }
 
 export async function registrarPagamento(req: Request, res: Response) {
 
-  const { aggregate_id, valor } = req.body
+  const { id } = req.params
+  const { valor } = req.body
 
   const usecase = new RegistrarPagamento(repository)
 
-  await usecase.execute(aggregate_id, valor)
+  await usecase.execute(id[0], valor)
 
-  res.json({ message: "Pagamento registrado" })
+  return res.status(201).json({
+    message: "Pagamento registrado"
+  })
 
 }
 
 export async function obterHistorico(req: Request, res: Response) {
 
-  const { aggregate_id } = req.query as any
+  const { id } = req.params
 
   const usecase = new ObterHistorico(repository)
 
-  const result = await usecase.execute(aggregate_id)
+  const result = await usecase.execute(id[0])
 
-  res.json(result)
+  return res.status(200).json(result)
 
 }
