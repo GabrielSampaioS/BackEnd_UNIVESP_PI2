@@ -6,6 +6,7 @@ import { CriarCliente } from "../../application/useCases/CriarCliente"
 import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
 import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
 import { ObterHistorico } from "../../application/useCases/ObterHistorico"
+import { LocalizarClientes } from "../../application/useCases/LocalizarClientes"
 
 const repository = new MongoEventRepository()
 
@@ -59,6 +60,21 @@ export async function obterHistorico(req: Request, res: Response) {
   const usecase = new ObterHistorico(repository)
 
   const result = await usecase.execute(id[0])
+
+  return res.status(200).json(result)
+
+}
+
+export async function localizarUser(req: Request, res: Response) {
+  const { nome, cpf } = req.query as {
+    nome?: string
+    cpf?: string
+  }
+
+
+  const usecase = new LocalizarClientes(repository)
+
+  const result = await usecase.execute(nome, cpf)
 
   return res.status(200).json(result)
 
