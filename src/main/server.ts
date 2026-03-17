@@ -9,8 +9,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv"
-import clienteRoutes from "./interfaces/routes/clientes"
-import { connectDatabase } from "./infrastructure/database/mongoose"
+import clienteRoutes from "../interfaces/routes/clientes"
+import { connectDatabase } from "../infrastructure/database/mongoose"
 dotenv.config()
 
 // =======================

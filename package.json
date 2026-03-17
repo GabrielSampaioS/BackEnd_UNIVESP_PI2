@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "generate": "ts-node src/main/scripts/generateData.ts"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "mongoose": "^8.18.0",
     "sequelize": "^6.37.7",

@@ -8,7 +8,9 @@ export class RegistrarDivida {
         const event = {
             aggregate_id,
             event_type: EventTypes.DIVIDA_REGISTRADA,
-            event_data: {valor}
+            event_data: {valor},
+            //created_at: new Date()
+
         }
 
         await this.repository.save(event)
