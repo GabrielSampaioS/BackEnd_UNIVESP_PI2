@@ -18,7 +18,13 @@ export async function criarCliente(req: Request, res: Response) {
 
    return res.status(201).json({
     message: "Cliente criado",
-    id: aggregate_id
+
+    id: aggregate_id,
+    nome: req.body.nome,
+    sobrenome: req.body.sobrenome,
+    telefone: req.body.telefone,
+    cpf: req.body.cpf,
+    email: req.body.email
   })
 
 }
