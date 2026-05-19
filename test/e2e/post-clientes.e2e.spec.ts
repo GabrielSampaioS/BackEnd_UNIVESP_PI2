@@ -5,7 +5,7 @@ import request from "supertest";
 import app from "../../src/main/app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import { response } from "express";
-import assert = require("node:assert");
+import assert from "node:assert";
 
 
 describe("Cadastrar cliente", () => {
