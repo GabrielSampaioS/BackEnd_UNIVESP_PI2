@@ -2,10 +2,22 @@ import { v4 as uuidv4 } from "uuid"
 import { EventRepository } from "../../domain/repositories/EventRepository"
 import { EventTypes } from "../../domain/events/EventTypes"
 
-export class CriarCliente{
-    constructor(private repository: EventRepository) {}
+export class CriarCliente {
+    constructor(private repository: EventRepository) { }
 
-    async execute(data: any){
+    async execute(data: any) {
+
+        const camposObrigatorios = [
+            "nome", "sobrenome", "telefone", "cpf", "email"
+        ]
+
+        for (const campo of camposObrigatorios) {
+            data[campo] = data[campo].trim()
+
+            if (!data[campo]) {
+                throw new Error('Dados inválidos para o cadastro do cliente')
+            }
+        }
         const aggregate_id = uuidv4()
 
         const event = {

@@ -7,57 +7,103 @@ import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
 import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
 import { ObterHistorico } from "../../application/useCases/ObterHistorico"
 import { LocalizarClientes } from "../../application/useCases/LocalizarClientes"
+import { AppError } from "../../shared/errors/AppError"
 
 const repository = new MongoEventRepository()
 
+//TODO tratra os erros na camada UseCases e COntrolers apenas encaminahr os erros
+
 export async function criarCliente(req: Request, res: Response) {
 
-  const usecase = new CriarCliente(repository)
+  try {
+    const usecase = new CriarCliente(repository)
 
-  const aggregate_id = await usecase.execute(req.body)
+    const aggregate_id = await usecase.execute(req.body)
 
-   return res.status(201).json({
-    message: "Cliente criado",
+    return res.status(201).json({
+      message: "Cliente criado",
+      data: {
+        id: aggregate_id,
+        nome: req.body.nome,
+        sobrenome: req.body.sobrenome,
+        telefone: req.body.telefone,
+        cpf: req.body.cpf,
+        email: req.body.email
+      }
 
-    id: aggregate_id,
-    nome: req.body.nome,
-    sobrenome: req.body.sobrenome,
-    telefone: req.body.telefone,
-    cpf: req.body.cpf,
-    email: req.body.email
-  })
+    })
+  } catch (error: any) {
+    return res.status(400).json({
+      message: error.message,
+      type: 'INVALID_DATA'
+    })
+  }
+
+
 
 }
 
 export async function registrarDivida(req: Request, res: Response) {
 
-  const { id } = req.params
-  const { valor } = req.body
+  try {
+    const { id } = req.params
+    const { valor } = req.body
 
-  const usecase = new RegistrarDivida(repository)
+    const usecase = new RegistrarDivida(repository)
 
-  //teste
-  await usecase.execute(id[0], valor)
 
-  return res.status(201).json({
-    message: "Divida registrada"
-  })
+    //Cambirra usar "as string" ??
+    await usecase.execute(id as string, valor)
+
+    return res.status(201).json({
+      message: "Divida registrada",
+      type: "DIVIDA_CRIADA"
+    })
+
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+        type: error.type
+      })
+    }
+  }
+
+  return res.status(500).json({
+    message: "Erro interno do servidor",
+    type: "INTERNAL_SERVER_ERROR"
+  });
 }
 
 export async function registrarPagamento(req: Request, res: Response) {
 
-  const { id } = req.params
-  const { valor } = req.body
+  try {
+    const { id } = req.params
+    const { valor } = req.body
 
-  const usecase = new RegistrarPagamento(repository)
+    const usecase = new RegistrarPagamento(repository)
 
-  await usecase.execute(id[0], valor)
+    await usecase.execute(id as string, valor)
 
-  return res.status(201).json({
-    message: "Pagamento registrado"
-  })
+    return res.status(201).json({
+      message: "Pagamento registrado",
+      type: "PAPAMENTO_CRIADA"
+    })
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+        type: error.type
+      })
+    }
+  }
 
+  return res.status(500).json({
+    message: "Erro interno do servidor",
+    type: "INTERNAL_SERVER_ERROR"
+  });
 }
+
 
 export async function obterHistorico(req: Request, res: Response) {
 
@@ -72,16 +118,36 @@ export async function obterHistorico(req: Request, res: Response) {
 }
 
 export async function localizarUser(req: Request, res: Response) {
-  const { nome, cpf } = req.query as {
-    nome?: string
-    cpf?: string
+
+  try {
+
+    const { nome, cpf } = req.query as {
+      nome?: string
+      cpf?: string
+    }
+
+    const usecase = new LocalizarClientes(repository)
+
+    const result = await usecase.execute(nome, cpf)
+
+
+    if (result.length > 0) {
+      return res.status(200).json(result)
+    } else {
+      return res.status(404).json({
+        message: 'Nenhum cliente encontrado',
+        type: 'NOT_FOUND'
+      })
+    }
+
+
+  } catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      type: 'ERRO_INTERNO'
+    })
+
   }
 
-
-  const usecase = new LocalizarClientes(repository)
-
-  const result = await usecase.execute(nome, cpf)
-
-  return res.status(200).json(result)
 
 }
