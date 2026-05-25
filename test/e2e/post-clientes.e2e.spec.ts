@@ -6,7 +6,7 @@ import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
 
 
-describe("Cadastrar cliente", () => {
+describe("POST /clientes", () => {
   before(async () => {
     await connectDatabase();
   });
@@ -26,7 +26,7 @@ describe("Cadastrar cliente", () => {
   });
 
 
-  test("Retorna os dados do cliente cadastrado quando os dados são válidos (201)", async () => {
+  test("deve cadastrar um cliente com dados válidos (201)", async () => {
 
     await request(app)
       .post("/clientes")
@@ -49,7 +49,7 @@ describe("Cadastrar cliente", () => {
 
   });
 
-  test("Retorna um erro ao cadastrar cliente com dados invalidos (400)", async () => {
+  test("deve retornar erro ao cadastrar cliente com dados inválidos (400)", async () => {
 
     await request(app)
       .post("/clientes")

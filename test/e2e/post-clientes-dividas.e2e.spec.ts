@@ -5,7 +5,7 @@ import app from "../../src/main/app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
 
-describe("Cadastrar divida do cliente", () => {
+describe("POST /clientes/:id/dividas", () => {
     before(async () => {
         await connectDatabase();
     });
@@ -24,7 +24,7 @@ describe("Cadastrar divida do cliente", () => {
         await mongoose.connection.close();
     });
 
-  test("Cadastrar uma dívida para um cliente existente (201)", async () => {
+  test("deve registrar dívida para cliente existente (201)", async () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
@@ -56,7 +56,7 @@ describe("Cadastrar divida do cliente", () => {
 
   });
 
-  test("Deve retornar erro ao cadastrar dívida para cliente inexistente (404)", async () => {
+  test("deve retornar erro ao registrar dívida para cliente inexistente (404)", async () => {
 
     const response = await request(app)
       .post("/clientes/1/dividas")
@@ -72,7 +72,7 @@ describe("Cadastrar divida do cliente", () => {
 
   });
 
-  test("Deve retornar erro ao cadastrar dívida com valor negativo (400)", async () => {
+  test("deve retornar erro ao registrar dívida com valor inválido (400)", async () => {
 
     const responseCliente = await request(app)
       .post("/clientes")

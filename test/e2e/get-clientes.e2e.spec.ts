@@ -6,7 +6,7 @@ import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
 
 
-describe("Localizar cliente", () => {
+describe("GET /clientes", () => {
   before(async () => {
     await connectDatabase();
   });
@@ -19,7 +19,7 @@ describe("Localizar cliente", () => {
     await mongoose.connection.close();
   });
 
-  test("Retorna os dados do cliente cadastrado com base no nome (200)", async () => {
+  test("deve localizar cliente pelo nome (200)", async () => {
 
     // cria cliente para localizar
     await request(app)
@@ -52,7 +52,7 @@ describe("Localizar cliente", () => {
 
   })
 
-  test("Retorna os dados do cliente cadastrado com base no CPF (200)", async () => {
+  test("deve localizar cliente pelo CPF (200)", async () => {
 
     // cria cliente para localizar
     await request(app)
@@ -89,7 +89,7 @@ describe("Localizar cliente", () => {
 
   })
 
-  test("Retorna erro ao não localizar nenhum cliente com o nome ou CPF (404)", async () => {
+  test("deve retornar erro ao não localizar cliente (404)", async () => {
 
     // cria cliente para localizar
     await request(app)
