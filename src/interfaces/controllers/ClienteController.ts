@@ -11,10 +11,7 @@ import { AppError } from "../../shared/errors/AppError"
 
 const repository = new MongoEventRepository()
 
-//TODO tratra os erros na camada UseCases e COntrolers apenas encaminahr os erros
-
 export async function criarCliente(req: Request, res: Response) {
-
   try {
     const usecase = new CriarCliente(repository)
 
@@ -38,8 +35,6 @@ export async function criarCliente(req: Request, res: Response) {
       type: 'INVALID_DATA'
     })
   }
-
-
 
 }
 
@@ -107,13 +102,33 @@ export async function registrarPagamento(req: Request, res: Response) {
 
 export async function obterHistorico(req: Request, res: Response) {
 
-  const { id } = req.params
+  try {
 
-  const usecase = new ObterHistorico(repository)
+    const { id } = req.params;
 
-  const result = await usecase.execute(id[0])
+    const usecase = new ObterHistorico(repository);
 
-  return res.status(200).json(result)
+    const result = await usecase.execute(id as string);
+
+    return res.status(200).json(result);
+
+  } catch (error: any) {
+
+    if (error instanceof AppError) {
+
+      return res.status(error.statusCode).json({
+        message: error.message,
+        type: error.type
+      });
+
+    }
+
+    return res.status(500).json({
+      message: "Erro interno do servidor",
+      type: "INTERNAL_SERVER_ERROR"
+    });
+
+  }
 
 }
 

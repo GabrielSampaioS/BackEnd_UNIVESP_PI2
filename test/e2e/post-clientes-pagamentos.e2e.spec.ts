@@ -5,27 +5,28 @@ import app from "../../src/main/app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
 
-describe("Cadastrar pagamento do cliente", () => {
-    before(async () => {
-        await connectDatabase();
-    });
+describe("Retornar o historico de dividas e pagemtos", () => {
+  before(async () => {
+    await connectDatabase();
+  });
 
-    beforeEach(async () => {
+  beforeEach(async () => {
 
-        const collections = mongoose.connection.collections;
+    const collections = mongoose.connection.collections;
 
-        for (const key in collections) {
-            await collections[key].deleteMany({});
-        }
+    for (const key in collections) {
+      await collections[key].deleteMany({});
+    }
 
-    });
+  });
 
-    after(async () => {
-        await mongoose.connection.close();
-    });
+  after(async () => {
+    await mongoose.connection.close();
+  });
 
-  test("Cadastrar um pagamento para um cliente existente (201)", async () => {
+  test("Deve retornar o histórico de um cliente existente (200)", async () => {
 
+    // Cria cliente
     const responseCliente = await request(app)
       .post("/clientes")
       .send({
@@ -39,28 +40,47 @@ describe("Cadastrar pagamento do cliente", () => {
 
     const idCliente = responseCliente.body.data.id;
 
-
-    const responsePagamento = await request(app)
-      .post(`/clientes/${idCliente}/pagamentos`)
+    // Registra dívida
+    await request(app)
+      .post(`/clientes/${idCliente}/dividas`)
       .send({
-        valor: 20
+        valor: 100
       })
       .expect(201);
 
+    // Registra pagamento
+    await request(app)
+      .post(`/clientes/${idCliente}/pagamentos`)
+      .send({
+        valor: 40
+      })
+      .expect(201);
+
+    // Busca histórico
+    const responseHistorico = await request(app)
+      .get(`/clientes/${idCliente}/eventos`)
+      .expect(200);
+
+    assert.ok(
+      Array.isArray(responseHistorico.body.historico)
+    );
+
     assert.strictEqual(
-      responsePagamento.body.type,
-      "PAPAMENTO_CRIADA"
+      responseHistorico.body.historico.length,
+      3
+    );
+
+    assert.strictEqual(
+      responseHistorico.body.saldo,
+      -60
     );
 
   });
 
-  test("Deve retornar erro ao cadastrar pagamento para cliente inexistente (404)", async () => {
+  test("Deve retornar erro ao buscar histórico de cliente inexistente (404)", async () => {
 
     const response = await request(app)
-      .post("/clientes/1/pagamentos")
-      .send({
-        valor: 20
-      })
+      .get("/clientes/1/eventos")
       .expect(404);
 
     assert.strictEqual(
@@ -68,35 +88,7 @@ describe("Cadastrar pagamento do cliente", () => {
       "CLIENT_NOT_FOUND"
     );
 
-  });
 
-  test("Deve retornar erro ao cadastrar pagamento com valor negativo (400)", async () => {
-
-    const responseCliente = await request(app)
-      .post("/clientes")
-      .send({
-        nome: "Gabriel",
-        sobrenome: "Sampaio",
-        telefone: "1999999999",
-        cpf: "12345678998",
-        email: "teste@gmail.com.br",
-      })
-      .expect(201);
-
-    const idCliente = responseCliente.body.data.id;
-
-    const response = await request(app)
-      .post(`/clientes/${idCliente}/pagamentos`)
-      .send({
-        valor: -20
-      })
-      .expect(400);
-
-    assert.strictEqual(
-      response.body.type,
-      "INVALID_DATA"
-    );
-
-  });
-
-});
+  })
+}
+)

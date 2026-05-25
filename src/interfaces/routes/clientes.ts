@@ -19,7 +19,7 @@ router.post("/clientes/:id/dividas", registrarDivida)
 //Teste ok
 router.post("/clientes/:id/pagamentos", registrarPagamento)
 
-// N 
+//Teste ok
 router.get("/clientes/:id/eventos", obterHistorico)
 
 //Teste ok
