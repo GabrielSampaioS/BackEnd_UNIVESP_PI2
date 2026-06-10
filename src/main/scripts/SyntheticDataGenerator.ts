@@ -1,6 +1,7 @@
 import { CriarCliente } from "../../application/useCases/CriarCliente"
 import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
 import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
+import { FormaPagamento } from "../../domain/enums/FormaPagamento"
 import { FakeDataGenerator } from "../../main/scripts/Helpers/FakeDataGenerator"
 
 export class SyntheticDataGenerator {
@@ -38,7 +39,8 @@ export class SyntheticDataGenerator {
 
                     await this.registrarDivida.execute(
                         clienteId,
-                        valorDivida
+                        valorDivida,
+                        ""
                     )
                 }
 
@@ -50,7 +52,8 @@ export class SyntheticDataGenerator {
 
                     await this.registrarPagamento.execute(
                         clienteId,
-                        valorPagamento
+                        valorPagamento,
+                        FormaPagamento.PIX
                     )
                 }
 
