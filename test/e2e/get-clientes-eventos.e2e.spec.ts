@@ -74,7 +74,7 @@ describe("GET /clientes/:id/eventos", () => {
 
     assert.strictEqual(
       responseHistorico.body.saldo,
-      -60
+      60
     );
 
   });

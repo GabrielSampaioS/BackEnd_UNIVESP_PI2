@@ -40,7 +40,6 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const idCliente = responseCliente.body.data.id;
 
-
     const responsePagamento = await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
       .send({
@@ -50,7 +49,7 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     assert.strictEqual(
       responsePagamento.body.type,
-      "PAPAMENTO_CRIADA"
+      "PAGAMENTO_CRIADO"
     );
 
   });

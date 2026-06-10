@@ -1,35 +1,16 @@
 import { EventRepository } from "../../domain/repositories/EventRepository";
-import { EventTypes } from "../../domain/events/EventTypes";
-
+import { Cliente } from "../../domain/entities/Cliente";
 import { AppError } from "../../shared/errors/AppError";
 
 export class RegistrarDivida {
 
   constructor(private repository: EventRepository) { }
 
-  async execute(aggregate_id: string, valor: number): Promise<void> {
+  async execute(aggregate_id: string,valor: number): Promise<void> {
 
-    // Validação de valor
-    if (!valor || valor <= 0) {
+    const events = await this.repository.findByAggregateId(aggregate_id);
 
-      throw new AppError(
-        "Valor inválido",
-        400,
-        "INVALID_DATA"
-      );
-
-    }
-
-
-    // Verifica se cliente existe
-    // Verifica se cliente existe (codigo dupolicado com o usercase RegistrarPagamento)
-
-    const cliente = await this.repository.findByAggregateId(
-      aggregate_id
-    );
-
-
-    if (!cliente || cliente.length === 0) {
+    if (!events || events.length === 0) {
 
       throw new AppError(
         "Cliente não encontrado",
@@ -39,26 +20,21 @@ export class RegistrarDivida {
 
     }
 
-    // Criação do evento
-    const event = {
+    const cliente =
+      Cliente.rehydrate(events);
 
-      aggregate_id,
-
-      event_type: EventTypes.DIVIDA_REGISTRADA,
-
-      event_data: {
-        valor
-      },
-
-      created_at: new Date()
-
-    };
+    const event =
+      cliente.registrarDivida(valor);
 
     try {
 
-      await this.repository.save(event);
+      await this.repository.save({
+        aggregate_id,
+        ...event,
+        created_at: new Date()
+      });
 
-    } catch (error) {
+    } catch {
 
       throw new AppError(
         "Erro ao registrar dívida",
@@ -67,7 +43,5 @@ export class RegistrarDivida {
       );
 
     }
-
   }
-
 }

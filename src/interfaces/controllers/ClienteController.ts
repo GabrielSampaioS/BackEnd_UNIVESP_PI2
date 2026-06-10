@@ -82,7 +82,7 @@ export async function registrarPagamento(req: Request, res: Response) {
 
     return res.status(201).json({
       message: "Pagamento registrado",
-      type: "PAPAMENTO_CRIADA"
+      type: "PAGAMENTO_CRIADO"
     })
   } catch (error: any) {
     if (error instanceof AppError) {

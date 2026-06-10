@@ -6,6 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:e2e": "tsx --env-file=.env --test test/e2e/**/*.e2e.spec.ts",
     "test:e2e-concurrency1": "tsx --env-file=.env --test --test-concurrency=1 test/e2e/**/*.e2e.spec.ts",
+    "test:unit": "tsx --env-file=.env --test test/unit/**/*.spec.ts",
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/main/server.js",
@@ -26,7 +27,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.4.0",
+    "@types/node": "^25.9.1",
     "@types/supertest": "^7.2.0",
     "@types/uuid": "^10.0.0",
     "supertest": "^7.2.2",
