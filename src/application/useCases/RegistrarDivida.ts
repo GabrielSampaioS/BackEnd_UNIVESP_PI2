@@ -6,7 +6,7 @@ export class RegistrarDivida {
 
   constructor(private repository: EventRepository) { }
 
-  async execute(aggregate_id: string,valor: number): Promise<void> {
+  async execute(aggregate_id: string, valor: number, descricao: string): Promise<void> {
 
     const events = await this.repository.findByAggregateId(aggregate_id);
 
@@ -24,7 +24,7 @@ export class RegistrarDivida {
       Cliente.rehydrate(events);
 
     const event =
-      cliente.registrarDivida(valor);
+      cliente.registrarDivida(valor, descricao);
 
     try {
 

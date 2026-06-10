@@ -317,15 +317,56 @@ Controller->>MongoDB: buscar eventos
 MongoDB-->>Controller: lista eventos
 Controller-->>Client: historico + saldo
 ```
-# Visão Geral dos Endpoints
+## Visão Geral dos Endpoints
 
-| Ação                     | Endpoint                     | Corpo / Query                 | Evento / Ação Interna                                           |
-|---------------------------|-----------------------------|-------------------------------|-----------------------------------------------------------------|
-| Criar Cliente             | `POST /clientes`            | `{ nome, sobrenome, telefone, cpf, email }` | Gera UUID, cria `ClienteCadastrado`, salva                     |
-| Localizar Cliente         | `GET /clientes/localizar`   | `nome`, `cpf`                 | Consulta `ClienteCadastrado`, retorna resultados filtrados      |
-| Registrar Dívida          | `POST /clientes/divida`     | `aggregate_id, {valor}`      | Cria `DividaRegistrada`, salva                                   |
-| Registrar Pagamento       | `POST /clientes/pagamento`  | `aggregate_id, {valor }`      | Cria `PagamentoEfetuado`, salva                                  |
-| Consultar Histórico       | `GET /clientes/historico`   | `aggregate_id`                 | Busca todos eventos do cliente, calcula saldo e retorna histórico |
+| Método | Endpoint                   | Corpo / Query                               | Ação Interna                                                                                 |
+| ------ | -------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| POST   | `/clientes`                | `{ nome, sobrenome, telefone, cpf, email }` | Gera um `aggregate_id`, cria o evento `ClienteCadastrado` e o armazena                       |
+| GET    | `/clientes`                | `?nome=` ou `?cpf=`                         | Localiza clientes a partir dos eventos de cadastro                                           |
+| POST   | `/clientes/:id/dividas`    | `{ valor }`                                 | Cria o evento `DividaRegistrada` e o armazena                                                |
+| POST   | `/clientes/:id/pagamentos` | `{ valor, forma_pagamento }`                | Cria o evento `PagamentoEfetuado`, calcula a taxa conforme a forma de pagamento e o armazena |
+| GET    | `/clientes/:id/eventos`    | -                                           | Busca todos os eventos do cliente, reconstrói o saldo e retorna o histórico                  |
+
+### Formas de Pagamento
+
+Ao registrar um pagamento, é necessário informar a forma de pagamento:
+
+```json
+{
+  "valor": 100,
+  "forma_pagamento": "PIX"
+}
+```
+
+Formas aceitas:
+
+* `PIX`
+* `DINHEIRO`
+* `CREDITO`
+
+### Taxas Aplicadas
+
+| Forma de Pagamento | Taxa |
+| ------------------ | ---- |
+| PIX                | 0%   |
+| DINHEIRO           | 0%   |
+| CREDITO            | 5%   |
+
+Exemplo:
+
+Dívida de R$100 paga no crédito:
+
+```json
+{
+  "valor_abatido": 100,
+  "forma_pagamento": "CREDITO",
+  "taxa_percentual": 5,
+  "valor_taxa": 5,
+  "valor_pago_cliente": 105
+}
+```
+
+Nesse caso, a dívida do cliente é reduzida em R$100, enquanto o cliente desembolsa R$105 devido à taxa da operadora do cartão.
 
 # Banco de Dados
 

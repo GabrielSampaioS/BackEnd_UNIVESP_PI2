@@ -82,7 +82,7 @@ describe("Cliente", () => {
         ]);
 
         const event = cliente.registrarDivida(50);
-        
+
 
         assert.strictEqual(
             event.event_type,
@@ -146,13 +146,19 @@ describe("Cliente", () => {
             {
                 event_type: EventTypes.DIVIDA_REGISTRADA,
                 event_data: {
-                    valor: 50
+                    valor: 50,
+                    forma_pagamento : "PIX"
+
                 }
             },
             {
                 event_type: EventTypes.PAGAMENTO_EFETUADO,
                 event_data: {
-                    valor: 20
+                    valor_abatido: 20,
+                    forma_pagamento: "PIX",
+                    taxa_percentual: 0,
+                    valor_taxa: 0,
+                    valor_pago_cliente: 20 + 0
                 }
             }
         ]);
@@ -164,6 +170,32 @@ describe("Cliente", () => {
 
     });
 
+    test.todo("teste com pagamento via credito, decontando apenas o valor pago e não o valor com juros")
 
-         
 });
+
+/* Explicação:
+   
+       assert.equal e assert.strictEqual:
+
+       - assert.equal(a, b) verifica se a == b, ou seja, compara os valores após realizar coerção de tipo. Por exemplo, assert.equal(1, "1") passaria, pois ambos são considerados iguais após a coerção.
+       - assert.strictEqual(a, b) verifica se a === b, ou seja, compara os valores sem realizar coerção de tipo. Por exemplo, assert.strictEqual(1, "1") falharia, pois um é um número e o outro é uma string.
+
+       Mesma coisa para as funções assert.deepEqual e assert.deepStrictEqual, onde a primeira realiza coerção de tipo e a segunda não.
+       Porem o deepStrictEqual também verificar a classe dos objetos, como exemplo:
+
+       class Pessoa {
+           constructor(public nome: string) {}
+       }
+       
+       const p1 = new Pessoa("Gabriel");
+       const p2 = new Pessoa("Gabriel");
+       const p3 = { nome: "Gabriel" };
+
+       assert.deepEqual(p1, p2); // Passa, pois os objetos têm as mesmas propriedades e valores
+       assert.deepStrictEqual(p1, p2); // Falha, pois p1 e p2 são instâncias diferentes da classe Pessoa
+       
+       assert.deepEqual(p1, p3); // Passa, pois os objetos têm as mesmas propriedades e valores
+       assert.deepStrictEqual(p1, p3); // Falha, pois p1 é uma instância da classe Pessoa e p3 é um objeto literal
+
+       */

@@ -43,12 +43,13 @@ export async function registrarDivida(req: Request, res: Response) {
   try {
     const { id } = req.params
     const { valor } = req.body
+    const {descricao} = req.body
 
     const usecase = new RegistrarDivida(repository)
 
 
     //Cambirra usar "as string" ??
-    await usecase.execute(id as string, valor)
+    await usecase.execute(id as string, valor, descricao)
 
     return res.status(201).json({
       message: "Divida registrada",
@@ -75,14 +76,20 @@ export async function registrarPagamento(req: Request, res: Response) {
   try {
     const { id } = req.params
     const { valor } = req.body
+    const { forma_pagamento } = req.body
 
     const usecase = new RegistrarPagamento(repository)
 
-    await usecase.execute(id as string, valor)
+    await usecase.execute(id as string, valor, forma_pagamento)
 
     return res.status(201).json({
       message: "Pagamento registrado",
-      type: "PAGAMENTO_CRIADO"
+      type: "PAGAMENTO_CRIADO",
+      data: {
+        valor,
+        forma_pagamento
+      }
+
     })
   } catch (error: any) {
     if (error instanceof AppError) {

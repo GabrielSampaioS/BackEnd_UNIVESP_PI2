@@ -45,7 +45,9 @@ describe("POST /clientes/:id/dividas", () => {
     const responseDivida = await request(app)
       .post(`/clientes/${idCliente}/dividas`)
       .send({
-        valor: 20
+        valor: 20,
+        descricao: "3 caixa de leite"
+
       })
       .expect(201);
 

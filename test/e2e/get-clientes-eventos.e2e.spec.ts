@@ -46,7 +46,8 @@ describe("GET /clientes/:id/eventos", () => {
     await request(app)
       .post(`/clientes/${idCliente}/dividas`)
       .send({
-        valor: 100
+        valor: 100,
+        descricao: "2kg de batata"
       })
       .expect(201);
 
@@ -54,7 +55,8 @@ describe("GET /clientes/:id/eventos", () => {
     await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
       .send({
-        valor: 40
+        valor: 40,
+        forma_pagamento : "PIX"
       })
       .expect(201);
 
@@ -76,6 +78,9 @@ describe("GET /clientes/:id/eventos", () => {
       responseHistorico.body.saldo,
       60
     );
+
+    console.log("testeeeeeeeeee")
+    console.log(responseHistorico.body.historico)
 
   });
 
