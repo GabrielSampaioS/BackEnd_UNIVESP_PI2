@@ -92,7 +92,7 @@ export class Cliente {
     }
 
     //TODO: registrarDivida e registrarPagamento deve ser uma função apenas 
-    registrarDivida(valor: number, descricao: string) {
+    registrarDivida(valor: number, descricao: string = "") {
 
         if (!valor || valor <= 0) {
 
