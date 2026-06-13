@@ -1,28 +1,37 @@
 import express from "express"
 
-import {
-  criarCliente,
-  registrarDivida,
-  registrarPagamento,
-  obterHistorico,
-  localizarUser
-} from "../controllers/ClienteController"
+import { ClienteController } from "../controllers/ClienteController"
+import { MongoEventRepository } from "../../infrastructure/repositories/MongoEventRepository"
 
 const router = express.Router()
 
-//Teste ok
-router.post("/clientes", criarCliente)
+const repository = new MongoEventRepository()
 
-//Teste ok
-router.post("/clientes/:id/dividas", registrarDivida)
+const clienteController = new ClienteController(repository)
 
-//Teste ok
-router.post("/clientes/:id/pagamentos", registrarPagamento)
+router.post(
+  "/clientes",
+  clienteController.criarCliente.bind(clienteController)
+)
 
-//Teste ok
-router.get("/clientes/:id/eventos", obterHistorico)
+router.post(
+  "/clientes/:id/dividas",
+  clienteController.registrarDivida.bind(clienteController)
+)
 
-//Teste ok
-router.get("/clientes", localizarUser)
+router.post(
+  "/clientes/:id/pagamentos",
+  clienteController.registrarPagamento.bind(clienteController)
+)
+
+router.get(
+  "/clientes/:id/eventos",
+  clienteController.obterHistorico.bind(clienteController)
+)
+
+router.get(
+  "/clientes",
+  clienteController.localizarUser.bind(clienteController)
+)
 
 export default router

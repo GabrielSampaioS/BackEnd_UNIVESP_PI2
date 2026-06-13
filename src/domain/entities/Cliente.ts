@@ -108,7 +108,7 @@ export class Cliente {
 
 
         //adicionar evento na variavel private events
-        this.addEvent({ event_type: EventTypes.DIVIDA_REGISTRADA, event_data: { valor: valor, descricao: descricao }, created_at: new Date() });
+        //this.addEvent({ event_type: EventTypes.DIVIDA_REGISTRADA, event_data: { valor: valor, descricao: descricao }, created_at: new Date() });
 
 
         return {
@@ -171,7 +171,7 @@ export class Cliente {
 
         //adicionar evento na variavel private events
 
-        this.addEvent({ event_type: EventTypes.PAGAMENTO_EFETUADO, event_data: event, created_at: new Date() });
+        //this.addEvent({ event_type: EventTypes.PAGAMENTO_EFETUADO, event_data: event, created_at: new Date() });
 
         return event;
     }

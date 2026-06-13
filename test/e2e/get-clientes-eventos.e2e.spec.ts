@@ -78,10 +78,6 @@ describe("GET /clientes/:id/eventos", () => {
       responseHistorico.body.saldo,
       60
     );
-
-    console.log("testeeeeeeeeee")
-    console.log(responseHistorico.body.historico)
-
   });
 
   test("deve retornar erro ao buscar histórico de cliente inexistente (404)", async () => {

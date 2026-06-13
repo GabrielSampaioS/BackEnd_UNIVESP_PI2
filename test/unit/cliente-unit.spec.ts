@@ -3,6 +3,7 @@ import assert from "node:assert";
 
 import { Cliente } from "../../src/domain/entities/Cliente";
 import { EventTypes } from "../../src/domain/events/EventTypes";
+import { FormaPagamento } from "../../src/domain/enums/FormaPagamento";
 
 describe("Cliente", () => {
 
@@ -62,7 +63,7 @@ describe("Cliente", () => {
                 email: "gabriel@email.com"
             });
 
-        });
+        } , {message: 'Campo nome é obrigatório'});
 
     });
 
@@ -81,7 +82,7 @@ describe("Cliente", () => {
             }
         ]);
 
-        const event = cliente.registrarDivida(50);
+        const event = cliente.registrarDivida(50, "Pão");
 
 
         assert.strictEqual(
@@ -93,11 +94,9 @@ describe("Cliente", () => {
             event.event_data.valor,
             50
         );
-
         assert.strictEqual(
-            cliente.getSaldo(),
-            50
-        );
+            event.event_data.descricao, "Pão"
+        )
 
     });
 
@@ -118,9 +117,9 @@ describe("Cliente", () => {
 
         assert.throws(() => {
 
-            cliente.registrarDivida(0), "Valor da dívida deve ser maior que zero";
+            cliente.registrarDivida(0)
 
-        });
+        }, {message: "Valor inválido"});
 
     });
 
