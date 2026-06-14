@@ -8,7 +8,6 @@ import mongoose from "mongoose";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import { ClienteController } from "../../src/interfaces/controllers/ClienteController"
 
-
 // Imports dos Use Cases
 import { CriarCliente } from "../../src/application/useCases/CriarCliente";
 import { RegistrarDivida } from "../../src/application/useCases/RegistrarDivida";
@@ -40,7 +39,6 @@ describe("Integração com UseCase e Repository", () => {
 
 
     test("deve criar cliente e persistir no MongoDB", async () => {
-        // teste envolvendo as camadas: UseCase e Repositories
 
         //arrange
         const repository = new MongoEventRepository();
@@ -48,7 +46,6 @@ describe("Integração com UseCase e Repository", () => {
 
 
         //act
-
         const clienteId = await usecase.execute({
             nome: "João",
             sobrenome: "Silva",
@@ -70,7 +67,6 @@ describe("Integração com UseCase e Repository", () => {
     })
 
     test("deve registrar dívida e pagamento para o cliente e validar divida final", async () => {
-        // teste envolvendo as camadas: UseCase, Repositories e Entities
 
         //arrange
         const repository = new MongoEventRepository();
@@ -79,7 +75,6 @@ describe("Integração com UseCase e Repository", () => {
         const registrarPagamentoUsecase = new RegistrarPagamento(repository)
 
         //act
-
         const clienteId = await usecase.execute({
             nome: "Maria",
             sobrenome: "Oliveira",
@@ -113,7 +108,7 @@ describe("Integração com UseCase e Repository", () => {
 
 })
 
-describe("Integração com Controller, UseCase e Repository", () => {
+describe("Integração com Controller, UseCase e Repository (Mock)", () => {
 
     before(async () => {
         await connectDatabase();
@@ -136,14 +131,13 @@ describe("Integração com Controller, UseCase e Repository", () => {
     test("criarCliente", async () => {
 
         /*
-        
         Mock de Request/Response.
         O problema é que o Controller está acoplado ao Express
         (Request e Response), então o teste precisa conhecer
         detalhes internos de como o Express funciona para recriar
-        parcialmente esses objetos.
-       
-       
+        parcialmente esses objetos.   
+
+        Teste com baixa redistencia a refotação por causa dos Spy, a troca de json para send, mesmo que não mudaria o resultado final, o teste vai falhar
         */
 
         const repository = new MongoEventRepository();
@@ -170,6 +164,8 @@ describe("Integração com Controller, UseCase e Repository", () => {
         await sut.criarCliente(reqSpy as any, resSpy as any);
 
         // Assert
+
+        //verboso d+
         assert.strictEqual(resSpy.status.mock.calls[0].arguments[0], 201);
 
         // controller usa json()
