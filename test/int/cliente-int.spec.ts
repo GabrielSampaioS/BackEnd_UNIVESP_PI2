@@ -1,5 +1,5 @@
 //lib para testes
-import test, { after, before, beforeEach, describe } from "node:test";
+import test, { after, before, beforeEach, describe, mock } from "node:test";
 import assert from "node:assert";
 
 // Imports da Infraestrutura
@@ -113,29 +113,82 @@ describe("Integração com UseCase e Repository", () => {
 
 })
 
-describe("Integração com Controller UseCase e Repository", () => {
+describe("Integração com Controller, UseCase e Repository", () => {
 
-    test.todo("criarCliente", async () => {
+    before(async () => {
+        await connectDatabase();
+    });
 
-        const repository = new MongoEventRepository();
-        const sut = new ClienteController(repository)
+    beforeEach(async () => {
 
-        //arrange
+        const collections = mongoose.connection.collections;
 
-        const clienteId = { nome: "Gabriel", sobrenome: "Sampaio", telefone: "1999999999", email: "g@gmail.com" }
-        const req = {}
-        const res = {
-            status() { return res },
-            json() { return res },
-            send() { return res },
+        for (const key in collections) {
+            await collections[key].deleteMany({});
         }
 
-        res.status.s
-        //act
-        await sut.criarCliente()
-    })
+    });
 
+    after(async () => {
+        await mongoose.connection.close();
+    });
 
+    test("criarCliente", async () => {
+
+        /*
+        
+        Mock de Request/Response.
+        O problema é que o Controller está acoplado ao Express
+        (Request e Response), então o teste precisa conhecer
+        detalhes internos de como o Express funciona para recriar
+        parcialmente esses objetos.
+       
+       
+        */
+
+        const repository = new MongoEventRepository();
+        const sut = new ClienteController(repository);
+
+        // Arrange
+        const reqSpy = {
+            body: {
+                nome: "Gabriel",
+                sobrenome: "Sampaio",
+                cpf: "   12345678998",
+                telefone: "19999999999",
+                email: "g@gmail.com"
+            }
+        };
+
+        const resSpy = {
+            status: mock.fn((code: number) => resSpy),
+            json: mock.fn((data: any) => resSpy),
+            send: mock.fn((data: any) => resSpy)
+        };
+
+        // Act
+        await sut.criarCliente(reqSpy as any, resSpy as any);
+
+        // Assert
+        assert.strictEqual(resSpy.status.mock.calls[0].arguments[0], 201);
+
+        // controller usa json()
+        const response = resSpy.json.mock.calls[0].arguments[0];
+        assert.ok(response);
+
+        //verificar propriedades
+        assert.ok(response.data.id)
+        assert.strictEqual(response.data.nome, reqSpy.body.nome);
+        assert.strictEqual(response.data.sobrenome, reqSpy.body.sobrenome);
+        assert.strictEqual(response.data.cpf, reqSpy.body.cpf);
+        assert.strictEqual(response.data.telefone, reqSpy.body.telefone);
+        assert.strictEqual(response.data.email, reqSpy.body.email);
+
+        /* Ideal seria validar que o uusário foi salvo, já que é um teste de integração
+        const eventos = await repository.findClientes(promise);
+        assert.strictEqual(eventos.length, 1);
+        */
+    });
 
     test.todo("registrarDivida", async () => { })
     test.todo("registrarPagamento", async () => { })
@@ -143,3 +196,4 @@ describe("Integração com Controller UseCase e Repository", () => {
     test.todo("localizarUser", async () => { })
 
 })
+
