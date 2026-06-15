@@ -1,12 +1,10 @@
-import { before, after, describe, test, todo, beforeEach } from "node:test";
+import { before, after, describe, test, todo, beforeEach, mock } from "node:test";
 import mongoose from "mongoose";
 import request from "supertest";
-import app from "../../src/main/app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
+import { createAppTest } from "../utils/create-test-app";
 
-
-describe("POST /clientes", () => {
   before(async () => {
     await connectDatabase();
   });
@@ -25,9 +23,14 @@ describe("POST /clientes", () => {
     await mongoose.connection.close();
   });
 
+  const {app} = createAppTest()
+
+
+describe("POST /clientes", () => {
 
   test("deve cadastrar um cliente com dados válidos (201)", async () => {
 
+    //arrange
     await request(app)
       .post("/clientes")
       .send({
@@ -69,3 +72,4 @@ describe("POST /clientes", () => {
   });
 
 });
+

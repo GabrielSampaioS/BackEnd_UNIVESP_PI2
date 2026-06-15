@@ -1,23 +1,27 @@
 import { before, after, describe, test, todo, beforeEach } from "node:test";
 import mongoose from "mongoose";
 import request from "supertest";
-import app from "../../src/main/app";
+import { createAppTest } from "../utils/create-test-app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
 
+before(async () => {
+  await connectDatabase();
+});
+
+beforeEach(async () => {
+  await mongoose.connection.collection("events").deleteMany({})
+})
+
+after(async () => {
+  await mongoose.connection.close();
+});
+
+const { app } = createAppTest()
+
 
 describe("GET /clientes", () => {
-  before(async () => {
-    await connectDatabase();
-  });
 
-  beforeEach(async () => {
-    await mongoose.connection.collection("events").deleteMany({})
-  })
-
-  after(async () => {
-    await mongoose.connection.close();
-  });
 
   test("deve localizar cliente pelo nome (200)", async () => {
 
@@ -110,7 +114,7 @@ describe("GET /clientes", () => {
         cpf: "11111111111"
       })
       .expect(404)
-      const codigoErro = response.body.type
-      assert.strict(codigoErro, 'NOT_FOUND')
+    const codigoErro = response.body.type
+    assert.strict(codigoErro, 'NOT_FOUND')
   })
 });

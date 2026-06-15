@@ -3,22 +3,25 @@
 // Use caminhos relativos: "./interfaces/..."
 
 import dotenv from "dotenv";
-import app from "./app";
-import { connectDatabase } from "../infrastructure/database/mongoose";
+import criarApp from "./app";
+
+import { MongoEventRepository } from "../infrastructure/repositories/MongoEventRepository";
+import { EmailGateway } from "../gateways/email.gateways";
 
 dotenv.config();
 
 
-async function startServer() {
+// Implemnetção real das interfaces
+const eventRepository = new MongoEventRepository();
+const emailService = new EmailGateway();
 
-  await connectDatabase();
+const app = criarApp({eventRepository, emailService});
 
-  const PORT = process.env.PORT || 3001;
+app.listen(
+    process.env.PORT ?? 3000,
+    () => {
+        console.log(`Servidor rodando na porta ${process.env.PORT ?? 3000}`);
 
-  app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-  });
+    }
+);
 
-}
-
-startServer();

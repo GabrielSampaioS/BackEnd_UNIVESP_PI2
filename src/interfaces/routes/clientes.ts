@@ -1,39 +1,41 @@
 import express from "express"
 
 import { ClienteController } from "../controllers/ClienteController"
-import { MongoEventRepository } from "../../infrastructure/repositories/MongoEventRepository"
-import { EmailGateway } from "../../gateways/email.gateways"
+import { EventRepository } from "../../domain/repositories/EventRepository"
+import { EmailService } from "../../domain/repositories/EmailService"
 
-const router = express.Router()
 
-const repository = new MongoEventRepository()
-const emailGateway = new EmailGateway()
+export default function clienteRoutes({ eventRepository, emailService }: { eventRepository: EventRepository, emailService: EmailService }) {
 
-const clienteController = new ClienteController(repository, emailGateway)
+  const router = express.Router()
 
-router.post(
-  "/clientes",
-  clienteController.criarCliente.bind(clienteController)
-)
+  const clienteController = new ClienteController(eventRepository, emailService)
 
-router.post(
-  "/clientes/:id/dividas",
-  clienteController.registrarDivida.bind(clienteController)
-)
+  router.post(
+    "/clientes",
+    clienteController.criarCliente.bind(clienteController)
+  )
 
-router.post(
-  "/clientes/:id/pagamentos",
-  clienteController.registrarPagamento.bind(clienteController)
-)
+  router.post(
+    "/clientes/:id/dividas",
+    clienteController.registrarDivida.bind(clienteController)
+  )
 
-router.get(
-  "/clientes/:id/eventos",
-  clienteController.obterHistorico.bind(clienteController)
-)
+  router.post(
+    "/clientes/:id/pagamentos",
+    clienteController.registrarPagamento.bind(clienteController)
+  )
 
-router.get(
-  "/clientes",
-  clienteController.localizarUser.bind(clienteController)
-)
+  router.get(
+    "/clientes/:id/eventos",
+    clienteController.obterHistorico.bind(clienteController)
+  )
 
-export default router
+  router.get(
+    "/clientes",
+    clienteController.localizarUser.bind(clienteController)
+  )
+  return router;
+}
+
+
