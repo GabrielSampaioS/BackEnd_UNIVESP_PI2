@@ -6,20 +6,23 @@ import globals from "globals";
 
 export default tseslint.config(
   js.configs.recommended,
-
   ...tseslint.configs.recommended,
-  {
-  ignores: [
-    "dist/**",
-    "node_modules/**"
-  ]
-},
 
   {
+    ignores: [
+      "dist/**",
+      "node_modules/**"
+    ],
+
     languageOptions: {
       globals: {
         ...globals.node,
       },
+    },
+
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   }
 );

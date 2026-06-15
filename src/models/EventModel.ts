@@ -1,12 +1,13 @@
 import mongoose, { Schema, Document} from "mongoose";
+import { EventTypes } from "../domain/events/EventTypes";
 
 export interface EventDocument extends Document {
 
     aggregate_id: string
 
-    event_type: string
+    event_type: EventTypes
 
-    event_data: any
+    event_data: any //DomainEvent?
 
     created_at: Date
 

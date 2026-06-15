@@ -45,7 +45,10 @@ export class CriarCliente {
                 cliente: dadosLimpos
             };
 
-        } catch {
+        } catch(error) {
+            if (error instanceof AppError) {
+                throw error;
+            } 
             throw new AppError(
                 "Erro ao criar cliente",
                 500,

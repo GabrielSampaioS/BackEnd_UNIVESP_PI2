@@ -1,11 +1,12 @@
-import { EventRepository } from "../../domain/repositories/EventRepository"
+import { DomainEvent } from "../../domain/events/DomainEvent"
 import ExcelJS from "exceljs"
+import { EventRepository } from "../../domain/repositories/EventRepository"
 
-export class ExcelEventRepository implements EventRepository {
+export class ExcelEventRepository implements EventRepository{
 
     private workbook: ExcelJS.Workbook
     private sheet: ExcelJS.Worksheet
-    private rowBuffer: any[] = []
+    private rowBuffer: DomainEvent[] = []
     private readonly BATCH_SIZE = 1000
 
     constructor() {
@@ -21,21 +22,21 @@ export class ExcelEventRepository implements EventRepository {
     }
 
 
-    async save(event: any): Promise<void> {
-        this.rowBuffer.push({
-            aggregate_id: event.aggregate_id,
-            event_type: event.event_type,
-            created_at: event.created_at,
-            event_data: JSON.stringify(event.event_data)
-        })
+    async save(event: DomainEvent): Promise<void> {
+        this.rowBuffer.push(event)
         if (this.rowBuffer.length >= this.BATCH_SIZE) {
             this.flush()
         }
     }
 
     private flush() {
-        for (const row of this.rowBuffer) {
-            this.sheet.addRow(row)
+        for (const event of this.rowBuffer) {
+            this.sheet.addRow({
+                aggregate_id: event.aggregate_id,
+                event_type: event.event_type,
+                created_at: event.created_at,
+                event_data: JSON.stringify(event.event_data)
+            })
         }
         this.rowBuffer = []
     }
@@ -51,13 +52,13 @@ export class ExcelEventRepository implements EventRepository {
 
     // ---------------- NÃO IMPLEMENTADOS ----------------
     // Problema com L do SOLID
-    findByAggregateId(id: string): Promise<any[]> {
+    findByAggregateId(id: string): Promise<DomainEvent[]> {
         throw new Error("Method not implemented.")
     }
-    findClientes(query: any): Promise<any[]> {
+    findClientes(query: any): Promise<DomainEvent[]> {
         throw new Error("Method not implemented.")
     }
-    findByNameOrCpf(nome?: string, cpf?: string): Promise<any[]> {
+    findByNameOrCpf(nome?: string, cpf?: string): Promise<DomainEvent[]> {
         throw new Error("Method not implemented.")
     }
 

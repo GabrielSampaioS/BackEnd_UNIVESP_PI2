@@ -1,8 +1,9 @@
 import EventModel from "../../models/EventModel"
 import { EventRepository } from "../../domain/repositories/EventRepository"
+import { DomainEvent } from "../../domain/events/DomainEvent"
 
 export class MongoEventRepository implements EventRepository {
-    findByNameOrCpf(nome?: string, cpf?: string): Promise<any[]> {
+    findByNameOrCpf(nome?: string, cpf?: string): Promise<DomainEvent[]> {
         const query: any = {
             event_type: "ClienteCadastrado"
         }
@@ -21,14 +22,14 @@ export class MongoEventRepository implements EventRepository {
         return EventModel.find(query)
 
     }
-    async save(event: any): Promise<void> {
+    async save(event: DomainEvent): Promise<void> {
         const doc = new EventModel(event)
         await doc.save()
     }
-    findByAggregateId(id: string): Promise<any[]> {
+    findByAggregateId(id: string): Promise<DomainEvent[]> {
         return EventModel.find({ aggregate_id: id }).sort({ created_at: 1 })
     }
-    findClientes(query: any): Promise<any[]> {
+    findClientes(query: any): Promise<DomainEvent[]> {
         return EventModel.find(query)
 
     }
