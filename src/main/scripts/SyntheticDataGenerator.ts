@@ -38,7 +38,7 @@ export class SyntheticDataGenerator {
                     const valorDivida = FakeDataGenerator.generateValue()
 
                     await this.registrarDivida.execute(
-                        clienteId,
+                        clienteId.id,
                         valorDivida,
                         ""
                     )
@@ -51,7 +51,7 @@ export class SyntheticDataGenerator {
                     const valorPagamento = FakeDataGenerator.generateValue()
 
                     await this.registrarPagamento.execute(
-                        clienteId,
+                        clienteId.id,
                         valorPagamento,
                         FormaPagamento.PIX
                     )
