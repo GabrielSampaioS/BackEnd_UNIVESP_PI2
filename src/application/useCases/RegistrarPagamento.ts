@@ -1,5 +1,4 @@
 import { EventRepository } from "../../domain/repositories/EventRepository"
-import { EventTypes } from "../../domain/events/EventTypes"
 import { AppError } from "../../shared/errors/AppError";
 import { Cliente } from "../../domain/entities/Cliente";
 import { FormaPagamento } from "../../domain/enums/FormaPagamento";
@@ -7,7 +6,7 @@ import { FormaPagamento } from "../../domain/enums/FormaPagamento";
 export class RegistrarPagamento {
     constructor(private repository: EventRepository) { }
 
-    async execute(aggregate_id: String, valor: number, forma_pagamento: FormaPagamento): Promise<void> {
+    async execute(aggregate_id: string, valor: number, forma_pagamento: FormaPagamento): Promise<void> {
 
         const events = await this.repository.findByAggregateId(aggregate_id);
 

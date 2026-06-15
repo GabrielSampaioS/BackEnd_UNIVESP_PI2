@@ -20,25 +20,33 @@ export class ClienteController {
     try {
       const usecase = new CriarCliente(this.repository, this.emailGateway)
 
-      const aggregate_id = await usecase.execute(req.body)
+      const result = await usecase.execute(req.body)
 
       return res.status(201).json({
         message: "Cliente criado",
         data: {
-          id: aggregate_id,
-          nome: req.body.nome,
-          sobrenome: req.body.sobrenome,
-          telefone: req.body.telefone,
-          cpf: req.body.cpf,
-          email: req.body.email
+          id: result.id,
+          nome: result.cliente.nome,
+          sobrenome: result.cliente.sobrenome,
+          telefone: result.cliente.telefone,
+          cpf: result.cliente.cpf,
+          email: result.cliente.email
         }
 
       })
-    } catch (error: any) {
-      return res.status(400).json({
-        message: error.message,
-        type: 'INVALID_DATA'
-      })
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({
+          message: error.message,
+          type: error.type
+        });
+      }
+
+      return res.status(500).json({
+        message: "Erro interno do servidor",
+        type: "INTERNAL_SERVER_ERROR"
+      });
+
     }
 
   }
@@ -61,19 +69,21 @@ export class ClienteController {
         type: "DIVIDA_CRIADA"
       })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof AppError) {
         return res.status(error.statusCode).json({
           message: error.message,
           type: error.type
-        })
+        });
       }
+
+      return res.status(500).json({
+        message: "Erro interno do servidor",
+        type: "INTERNAL_SERVER_ERROR"
+      });
+
     }
 
-    return res.status(500).json({
-      message: "Erro interno do servidor",
-      type: "INTERNAL_SERVER_ERROR"
-    });
   }
 
   async registrarPagamento(req: Request, res: Response) {
@@ -96,19 +106,21 @@ export class ClienteController {
         }
 
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof AppError) {
         return res.status(error.statusCode).json({
           message: error.message,
           type: error.type
-        })
+        });
       }
+
+      return res.status(500).json({
+        message: "Erro interno do servidor",
+        type: "INTERNAL_SERVER_ERROR"
+      });
+
     }
 
-    return res.status(500).json({
-      message: "Erro interno do servidor",
-      type: "INTERNAL_SERVER_ERROR"
-    });
   }
 
 
@@ -124,15 +136,12 @@ export class ClienteController {
 
       return res.status(200).json(result);
 
-    } catch (error: any) {
-
+    } catch (error: unknown) {
       if (error instanceof AppError) {
-
         return res.status(error.statusCode).json({
           message: error.message,
           type: error.type
         });
-
       }
 
       return res.status(500).json({
@@ -167,16 +176,21 @@ export class ClienteController {
         })
       }
 
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({
+          message: error.message,
+          type: error.type
+        });
+      }
 
-    } catch (error: any) {
       return res.status(500).json({
-        message: error.message,
-        type: 'ERRO_INTERNO'
-      })
+        message: "Erro interno do servidor",
+        type: "INTERNAL_SERVER_ERROR"
+      });
 
     }
 
-
   }
-  
+
 }

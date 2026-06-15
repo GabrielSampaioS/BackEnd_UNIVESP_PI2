@@ -25,7 +25,7 @@ export class MongoEventRepository implements EventRepository {
         const doc = new EventModel(event)
         await doc.save()
     }
-    findByAggregateId(id: String): Promise<any[]> {
+    findByAggregateId(id: string): Promise<any[]> {
         return EventModel.find({ aggregate_id: id }).sort({ created_at: 1 })
     }
     findClientes(query: any): Promise<any[]> {

@@ -3,25 +3,28 @@ import { EventRepository } from "../../domain/repositories/EventRepository"
 import { EventTypes } from "../../domain/events/EventTypes"
 import { Cliente } from "../../domain/entities/Cliente"
 import { EmailService } from "../../domain/repositories/EmailService"
+import { CriarClienteDTO } from "../dto/CriarClienteDTO"
 
 export class CriarCliente {
-    
-    constructor(private repository: EventRepository, private emailService: EmailService) {}
 
-    async execute(data: any) {
+    constructor(private repository: EventRepository, private emailService: EmailService) { }
 
-        Cliente.validarCadastro(data)
+    async execute(data: CriarClienteDTO) {
+
+        const dadosLimpos = Cliente.sanitizarCadastro(data);
+        Cliente.validarCadastro(dadosLimpos)
+
         const aggregate_id = uuidv4()
 
         const event = {
             aggregate_id,
             event_type: EventTypes.CLIENTE_CADASTRADO,
             event_data: {
-                nome: data.nome,
-                sobrenome: data.sobrenome,
-                telefone: data.telefone ,
-                cpf: data.cpf,
-                email: data.email
+                nome: dadosLimpos.nome,
+                sobrenome: dadosLimpos.sobrenome,
+                telefone: dadosLimpos.telefone,
+                cpf: dadosLimpos.cpf,
+                email: dadosLimpos.email
             },
             created_at: new Date()
         }
@@ -36,7 +39,7 @@ export class CriarCliente {
             mensagem: "Recebemos a solocitação de cadastro para o seu usuário"
         })
 
-        return aggregate_id
+        return {id: aggregate_id, cliente: dadosLimpos}
     }
 
 

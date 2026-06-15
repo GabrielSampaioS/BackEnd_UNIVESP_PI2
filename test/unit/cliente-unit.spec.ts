@@ -3,7 +3,6 @@ import assert from "node:assert";
 
 import { Cliente } from "../../src/domain/entities/Cliente";
 import { EventTypes } from "../../src/domain/events/EventTypes";
-import { FormaPagamento } from "../../src/domain/enums/FormaPagamento";
 
 describe("Cliente", () => {
 

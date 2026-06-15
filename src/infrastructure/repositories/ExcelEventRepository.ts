@@ -1,4 +1,3 @@
-import EventModel from "../../models/EventModel"
 import { EventRepository } from "../../domain/repositories/EventRepository"
 import ExcelJS from "exceljs"
 
@@ -52,7 +51,7 @@ export class ExcelEventRepository implements EventRepository {
 
     // ---------------- NÃO IMPLEMENTADOS ----------------
     // Problema com L do SOLID
-    findByAggregateId(id: String): Promise<any[]> {
+    findByAggregateId(id: string): Promise<any[]> {
         throw new Error("Method not implemented.")
     }
     findClientes(query: any): Promise<any[]> {

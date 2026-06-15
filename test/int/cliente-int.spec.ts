@@ -54,10 +54,10 @@ describe("Integração - UseCase + Repository", () => {
 
 
         //act
-        const clienteId = await sut.execute(createClienteDTO())
+        const clienteRetorno = await sut.execute(createClienteDTO())
 
         //assert
-        const eventos = await repository.findByAggregateId(clienteId);
+        const eventos = await repository.findByAggregateId(clienteRetorno.id);
 
         assert.strictEqual(eventos.length, 1);
         assert.strictEqual(eventos[0].event_type, "ClienteCadastrado");
@@ -80,14 +80,14 @@ describe("Integração - UseCase + Repository", () => {
         const registrarPagamentoUsecase = new RegistrarPagamento(repository)
 
         //act
-        const clienteId = await criarClienteUseCase.execute(createClienteDTO());
+        const clienteRetorno = await criarClienteUseCase.execute(createClienteDTO());
 
 
-        await registrarDividaUsecase.execute(clienteId, 100, "Compra no supermercado");
-        await registrarPagamentoUsecase.execute(clienteId, 50, FormaPagamento.PIX);
+        await registrarDividaUsecase.execute(clienteRetorno.id, 100, "Compra no supermercado");
+        await registrarPagamentoUsecase.execute(clienteRetorno.id, 50, FormaPagamento.PIX);
 
         //assert
-        const eventos = await repository.findByAggregateId(clienteId);
+        const eventos = await repository.findByAggregateId(clienteRetorno.id);
         assert.strictEqual(eventos.length, 3);
         assert.strictEqual(eventos[0].event_type, "ClienteCadastrado");
         assert.strictEqual(eventos[1].event_type, "DividaRegistrada");
@@ -201,7 +201,7 @@ describe("Controller", () => {
 
         const dados = createClienteDTO()
 
-        const clienteId =
+        const clienteRetorno =
             await criarCliente.execute({
                 nome: dados.nome,
                 sobrenome: dados.sobrenome,
@@ -212,7 +212,7 @@ describe("Controller", () => {
 
         const reqSpy = {
             params: {
-                id: clienteId
+                id: clienteRetorno.id
             },
             body: {
                 valor: 100,
@@ -239,7 +239,7 @@ describe("Controller", () => {
 
         assert.ok(response);
 
-        const eventos = await repository.findByAggregateId(clienteId);
+        const eventos = await repository.findByAggregateId(clienteRetorno.id);
 
         assert.strictEqual(eventos.length, 2);
 
@@ -268,7 +268,7 @@ describe("Controller", () => {
 
         const dados = createClienteDTO()
 
-        const clienteId =
+        const clienteRetorno =
             await criarCliente.execute({
                 nome: dados.nome,
                 sobrenome: dados.sobrenome,
@@ -278,14 +278,14 @@ describe("Controller", () => {
             });
 
         await registrarDivida.execute(
-            clienteId,
+            clienteRetorno.id,
             100,
             "Compra no mercado"
         );
 
         const reqSpy = {
             params: {
-                id: clienteId
+                id: clienteRetorno.id
             },
             body: {
                 valor: 50,
@@ -308,7 +308,7 @@ describe("Controller", () => {
 
         assert.deepEqual(resSpy.status.mock.calls[0].arguments, [201]);
 
-        const eventos = await repository.findByAggregateId(clienteId);
+        const eventos = await repository.findByAggregateId(clienteRetorno.id);
 
         assert.strictEqual(eventos.length, 3);
 
@@ -335,8 +335,9 @@ describe("Controller", () => {
             );
 
 
+
         const dados = createClienteDTO()
-        const clienteId =
+        const clienteRetorno =
             await criarCliente.execute({
                 nome: dados.nome,
                 sobrenome: dados.sobrenome,
@@ -347,7 +348,7 @@ describe("Controller", () => {
 
         const reqSpy = {
             params: {
-                id: clienteId
+                id: clienteRetorno.id
             }
         };
 

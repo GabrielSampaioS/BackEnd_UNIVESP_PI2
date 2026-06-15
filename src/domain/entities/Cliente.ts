@@ -1,3 +1,4 @@
+import { CriarClienteDTO } from "../../application/dto/CriarClienteDTO";
 import { AppError } from "../../shared/errors/AppError";
 import { FormaPagamento } from "../enums/FormaPagamento";
 import { EventTypes } from "../events/EventTypes";
@@ -39,9 +40,19 @@ export class Cliente {
         return cliente;
     }
 
-    static validarCadastro(data: any) {
+    static sanitizarCadastro(data: CriarClienteDTO): CriarClienteDTO {
+        return {
+            nome: data.nome.trim(),
+            sobrenome: data.sobrenome.trim(),
+            telefone: data.telefone.trim(),
+            cpf: data.cpf.trim(),
+            email: data.email.trim()
+        }
+    }
 
-        const camposObrigatorios = [
+    static validarCadastro(data: CriarClienteDTO): void {
+
+        const camposObrigatorios: (keyof CriarClienteDTO)[] = [
             "nome",
             "sobrenome",
             "telefone",
@@ -50,12 +61,7 @@ export class Cliente {
         ];
 
         for (const campo of camposObrigatorios) {
-
-            if (
-                !data[campo] ||
-                typeof data[campo] !== "string" ||
-                !data[campo].trim()
-            ) {
+            if (!data[campo]) {
                 throw new AppError(
                     `Campo ${campo} é obrigatório`,
                     400,
@@ -63,7 +69,6 @@ export class Cliente {
                 );
             }
 
-            data[campo] = data[campo].trim();
         }
     }
 
@@ -169,16 +174,7 @@ export class Cliente {
             },
         };
 
-        //adicionar evento na variavel private events
-
-        //this.addEvent({ event_type: EventTypes.PAGAMENTO_EFETUADO, event_data: event, created_at: new Date() });
 
         return event;
     }
-
-    private addEvent(event: any) {
-
-        this.events.push(event);
-    }
-
 }
