@@ -16,72 +16,71 @@ import { RegistrarPagamento } from "../../src/application/useCases/RegistrarPaga
 // Imports do Domínio
 import { FormaPagamento } from "../../src/domain/enums/FormaPagamento";
 import { Cliente } from "../../src/domain/entities/Cliente";
+import { createClienteDTO } from "../factories/cliente.factory";
 
-describe("Integração com UseCase e Repository", () => {
+before(async () => {
+    await connectDatabase();
+});
 
-    before(async () => {
-        await connectDatabase();
-    });
+beforeEach(async () => {
+    const collections = mongoose.connection.collections;
 
-    beforeEach(async () => {
+    for (const key in collections) {
+        await collections[key].deleteMany({});
+    }
+});
 
-        const collections = mongoose.connection.collections;
+after(async () => {
+    await mongoose.connection.close();
+});
 
-        for (const key in collections) {
-            await collections[key].deleteMany({});
-        }
+// Mock para evitar envio real de e-mails
+function createEmailGatewayMock() {
+    return {
+        sendEmail: mock.fn(async () => { })
+    };
+}
 
-    });
 
-    after(async () => {
-        await mongoose.connection.close();
-    });
+describe("Integração - UseCase + Repository", () => {
 
 
     test("deve criar cliente e persistir no MongoDB", async () => {
 
         //arrange
         const repository = new MongoEventRepository();
-        const usecase = new CriarCliente(repository);
+        const emailGatewayMock = createEmailGatewayMock();
+        const sut = new CriarCliente(repository, emailGatewayMock);
 
 
         //act
-        const clienteId = await usecase.execute({
-            nome: "João",
-            sobrenome: "Silva",
-            telefone: "11999999999",
-            cpf: "12345678900",
-            email: "joao@email.com"
-        })
+        const clienteId = await sut.execute(createClienteDTO())
 
         //assert
         const eventos = await repository.findByAggregateId(clienteId);
+
         assert.strictEqual(eventos.length, 1);
         assert.strictEqual(eventos[0].event_type, "ClienteCadastrado");
-        assert.strictEqual(eventos[0].event_data.nome, "João");
-        assert.strictEqual(eventos[0].event_data.sobrenome, "Silva");
-        assert.strictEqual(eventos[0].event_data.telefone, "11999999999");
-        assert.strictEqual(eventos[0].event_data.cpf, "12345678900");
-        assert.strictEqual(eventos[0].event_data.email, "joao@email.com");
+        assert.strictEqual(eventos[0].event_data.nome, createClienteDTO().nome);
+        assert.strictEqual(eventos[0].event_data.sobrenome, createClienteDTO().sobrenome);
+        assert.strictEqual(eventos[0].event_data.telefone, createClienteDTO().telefone);
+        assert.strictEqual(eventos[0].event_data.cpf, createClienteDTO().cpf);
+        assert.strictEqual(eventos[0].event_data.email, createClienteDTO().email);
 
     })
 
-    test("deve registrar dívida e pagamento para o cliente e validar divida final", async () => {
+    test("deve registrar dívida e pagamento e calcular saldo corretamente", async () => {
 
         //arrange
         const repository = new MongoEventRepository();
-        const usecase = new CriarCliente(repository);
+        const emailGatewayMock = createEmailGatewayMock();
+
+        const criarClienteUseCase = new CriarCliente(repository, emailGatewayMock);
         const registrarDividaUsecase = new RegistrarDivida(repository)
         const registrarPagamentoUsecase = new RegistrarPagamento(repository)
 
         //act
-        const clienteId = await usecase.execute({
-            nome: "Maria",
-            sobrenome: "Oliveira",
-            telefone: "11988888888",
-            cpf: "98765432100",
-            email: "maria@email.com"
-        });
+        const clienteId = await criarClienteUseCase.execute(createClienteDTO());
 
 
         await registrarDividaUsecase.execute(clienteId, 100, "Compra no supermercado");
@@ -108,49 +107,32 @@ describe("Integração com UseCase e Repository", () => {
 
 })
 
-describe("Integração com Controller, UseCase e Repository (Mock)", () => {
+describe("Controller", () => {
+    /*
+    Mock de Request/Response.
+    O problema é que o Controller está acoplado ao Express
+    (Request e Response), então o teste precisa conhecer
+    detalhes internos de como o Express funciona para recriar
+    parcialmente esses objetos.   
+    Teste com baixa redistencia a refotação por causa dos Spy, a troca de json para send, mesmo que não mudaria o resultado final, o teste vai falhar
+    */
+    test("criarCliente deve retornar status 201", async () => {
 
-    before(async () => {
-        await connectDatabase();
-    });
-
-    beforeEach(async () => {
-
-        const collections = mongoose.connection.collections;
-
-        for (const key in collections) {
-            await collections[key].deleteMany({});
-        }
-
-    });
-
-    after(async () => {
-        await mongoose.connection.close();
-    });
-
-    test("criarCliente", async () => {
-
-        /*
-        Mock de Request/Response.
-        O problema é que o Controller está acoplado ao Express
-        (Request e Response), então o teste precisa conhecer
-        detalhes internos de como o Express funciona para recriar
-        parcialmente esses objetos.   
-
-        Teste com baixa redistencia a refotação por causa dos Spy, a troca de json para send, mesmo que não mudaria o resultado final, o teste vai falhar
-        */
 
         const repository = new MongoEventRepository();
-        const sut = new ClienteController(repository);
+        const emailGatewayMock = createEmailGatewayMock();
+        const sut = new ClienteController(repository, emailGatewayMock);
 
         // Arrange
+        const dados = createClienteDTO()
+
         const reqSpy = {
             body: {
-                nome: "Gabriel",
-                sobrenome: "Sampaio",
-                cpf: "   12345678998",
-                telefone: "19999999999",
-                email: "g@gmail.com"
+                nome: dados.nome,
+                sobrenome: dados.sobrenome,
+                cpf: dados.cpf,
+                telefone: dados.telefone,
+                email: dados.email
             }
         };
 
@@ -164,15 +146,11 @@ describe("Integração com Controller, UseCase e Repository (Mock)", () => {
         await sut.criarCliente(reqSpy as any, resSpy as any);
 
         // Assert
-
-        //verboso d+
+        assert.strictEqual(resSpy.status.mock.calls.length, 1);
         assert.strictEqual(resSpy.status.mock.calls[0].arguments[0], 201);
 
-        // controller usa json()
         const response = resSpy.json.mock.calls[0].arguments[0];
         assert.ok(response);
-
-        //verificar propriedades
         assert.ok(response.data.id)
         assert.strictEqual(response.data.nome, reqSpy.body.nome);
         assert.strictEqual(response.data.sobrenome, reqSpy.body.sobrenome);
@@ -180,16 +158,331 @@ describe("Integração com Controller, UseCase e Repository (Mock)", () => {
         assert.strictEqual(response.data.telefone, reqSpy.body.telefone);
         assert.strictEqual(response.data.email, reqSpy.body.email);
 
-        /* Ideal seria validar que o uusário foi salvo, já que é um teste de integração
-        const eventos = await repository.findClientes(promise);
+        // Verificar persistência no banco
+        const eventos =
+            await repository.findByAggregateId(
+                response.data.id
+            );
+
         assert.strictEqual(eventos.length, 1);
-        */
+
+        assert.strictEqual(eventos[0].event_type, "ClienteCadastrado");
+
+        assert.strictEqual(eventos[0].event_data.nome, reqSpy.body.nome);
+
+        assert.strictEqual(eventos[0].event_data.sobrenome, reqSpy.body.sobrenome);
+
+        assert.strictEqual(eventos[0].event_data.cpf, reqSpy.body.cpf);
+
+        assert.strictEqual(eventos[0].event_data.telefone, reqSpy.body.telefone);
+
+        assert.strictEqual(eventos[0].event_data.email, reqSpy.body.email);
     });
 
-    test.todo("registrarDivida", async () => { })
-    test.todo("registrarPagamento", async () => { })
-    test.todo("obterHistorico", async () => { })
-    test.todo("localizarUser", async () => { })
+    test("registrarDivida deve retornar status 201", async () => {
+
+        const repository = new MongoEventRepository();
+        const emailGateway = createEmailGatewayMock();
+
+        const controller =
+            new ClienteController(
+                repository,
+                emailGateway
+            );
+
+        // Arrange
+        const criarCliente =
+            new CriarCliente(
+                repository,
+                emailGateway
+            );
+
+
+
+        const dados = createClienteDTO()
+
+        const clienteId =
+            await criarCliente.execute({
+                nome: dados.nome,
+                sobrenome: dados.sobrenome,
+                cpf: dados.cpf,
+                telefone: dados.telefone,
+                email: dados.email
+            });
+
+        const reqSpy = {
+            params: {
+                id: clienteId
+            },
+            body: {
+                valor: 100,
+                descricao: "Compra no mercado"
+            }
+        };
+
+        const resSpy = {
+            status: mock.fn(() => resSpy),
+            json: mock.fn(() => resSpy),
+            send: mock.fn(() => resSpy)
+        };
+
+        // Act
+        await controller.registrarDivida(
+            reqSpy as any,
+            resSpy as any
+        );
+
+        // Assert
+        assert.deepEqual(resSpy.status.mock.calls[0].arguments, [201]);
+
+        const response = resSpy.json.mock.calls[0].arguments;
+
+        assert.ok(response);
+
+        const eventos = await repository.findByAggregateId(clienteId);
+
+        assert.strictEqual(eventos.length, 2);
+
+        assert.strictEqual(
+            eventos[1].event_type,
+            "DividaRegistrada"
+        );
+
+        assert.strictEqual(
+            eventos[1].event_data.valor,
+            100
+        );
+    });
+
+    test("registrarPagamento deve retornar status 201", async () => {
+
+        const repository = new MongoEventRepository();
+        const emailGateway = createEmailGatewayMock();
+
+        const controller = new ClienteController(repository, emailGateway);
+
+        const criarCliente = new CriarCliente(repository, emailGateway);
+
+        const registrarDivida = new RegistrarDivida(repository);
+
+
+        const dados = createClienteDTO()
+
+        const clienteId =
+            await criarCliente.execute({
+                nome: dados.nome,
+                sobrenome: dados.sobrenome,
+                cpf: dados.cpf,
+                telefone: dados.telefone,
+                email: dados.email
+            });
+
+        await registrarDivida.execute(
+            clienteId,
+            100,
+            "Compra no mercado"
+        );
+
+        const reqSpy = {
+            params: {
+                id: clienteId
+            },
+            body: {
+                valor: 50,
+                forma_pagamento: FormaPagamento.PIX
+            }
+        };
+
+        const resSpy = {
+            status: mock.fn(() => resSpy),
+            json: mock.fn(() => resSpy),
+            send: mock.fn(() => resSpy)
+        };
+
+        await controller.registrarPagamento(
+            reqSpy as any,
+            resSpy as any
+        );
+
+        //assert
+
+        assert.deepEqual(resSpy.status.mock.calls[0].arguments, [201]);
+
+        const eventos = await repository.findByAggregateId(clienteId);
+
+        assert.strictEqual(eventos.length, 3);
+
+        assert.strictEqual(eventos[2].event_type, "PagamentoEfetuado");
+
+        assert.strictEqual(eventos[2].event_data.valor_abatido, 50);
+    });
+
+    test("obterHistorico deve retornar status 200 e lista de eventos", async () => {
+
+        const repository = new MongoEventRepository();
+        const emailGateway = createEmailGatewayMock();
+
+        const controller =
+            new ClienteController(
+                repository,
+                emailGateway
+            );
+
+        const criarCliente =
+            new CriarCliente(
+                repository,
+                emailGateway
+            );
+
+
+        const dados = createClienteDTO()
+        const clienteId =
+            await criarCliente.execute({
+                nome: dados.nome,
+                sobrenome: dados.sobrenome,
+                cpf: dados.cpf,
+                telefone: dados.telefone,
+                email: dados.email
+            });
+
+        const reqSpy = {
+            params: {
+                id: clienteId
+            }
+        };
+
+        const resSpy = {
+            status: mock.fn(() => resSpy),
+            json: mock.fn(() => resSpy),
+            send: mock.fn(() => resSpy)
+        };
+
+        await controller.obterHistorico(
+            reqSpy as any,
+            resSpy as any
+        );
+
+        //assert
+        assert.deepEqual(resSpy.status.mock.calls[0].arguments, [200]);
+
+        const response = resSpy.json.mock.calls[0].arguments;
+
+        assert.ok(response);
+
+        /*assert.strictEqual(
+            response.data.length,
+            1
+        );*/
+    });
+
+    test("localizarUser deve retornar clientes encontrados", async () => {
+
+        const repository = new MongoEventRepository();
+        const emailGateway = createEmailGatewayMock();
+
+        const controller =
+            new ClienteController(
+                repository,
+                emailGateway
+            );
+
+        const criarCliente =
+            new CriarCliente(
+                repository,
+                emailGateway
+            );
+
+        const dados = createClienteDTO()
+
+        await criarCliente.execute({
+            nome: dados.nome,
+            sobrenome: dados.sobrenome,
+            cpf: dados.cpf,
+            telefone: dados.telefone,
+            email: dados.email
+        });
+
+        const reqSpy = {
+            query: {
+                nome: dados.nome
+            }
+        };
+
+        const resSpy = {
+            status: mock.fn(() => resSpy),
+            json: mock.fn(() => resSpy),
+            send: mock.fn(() => resSpy)
+        };
+
+        await controller.localizarUser(
+            reqSpy as any,
+            resSpy as any
+        );
+
+        assert.deepEqual(
+            resSpy.status.mock.calls[0].arguments,
+            [200]
+        );
+
+        const response =
+            resSpy.json.mock.calls[0].arguments;
+
+        assert.ok(response);
+
+        /*assert.strictEqual(
+            response.data.length,
+            1
+        );
+
+        assert.strictEqual(
+            response.data[0].nome,
+            "Gabriel"
+        );*/
+    });
 
 })
 
+describe("CriarCliente - envio de e-mail", () => {
+
+    // Quando queremos apenas verificar se uma dependência foi chamada,
+    // sem nos preocupar com seu comportamento real, utilizamos Mocks.
+    //
+    // Exemplo: envio de e-mail. Queremos garantir que o método
+    // sendEmail() foi chamado com os dados corretos.
+    //
+    // Quando precisamos simular uma resposta para que o código
+    // continue sua execução, utilizamos Stubs.
+    //
+    // Exemplo: consultar estoque, CEP ou score de crédito.
+    // O sistema precisa receber uma resposta para tomar uma decisão,
+    // então o teste fornece um retorno controlado.
+
+    test("deve enviar um e-mail após criar cliente", async () => {
+
+        //arrange
+        const repository = new MongoEventRepository();
+        const emailGatewayMock = createEmailGatewayMock()
+        const sut = new CriarCliente(repository, emailGatewayMock);
+
+        //act
+        const clienteId = await sut.execute(createClienteDTO())
+
+        //assert
+
+        assert.ok(clienteId)
+        const email =
+            emailGatewayMock
+                .sendEmail
+                .mock
+                .calls[0]
+                .arguments;
+
+        assert.deepStrictEqual(email, [{
+            remetente: "no-reply@mercado.com",
+            destinatario: "João",
+            assunto: "Usuário cadastrado",
+            mensagem: "Recebemos a solocitação de cadastro para o seu usuário"
+        }])
+    })
+
+})

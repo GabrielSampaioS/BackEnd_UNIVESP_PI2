@@ -7,16 +7,18 @@ import { ObterHistorico } from "../../application/useCases/ObterHistorico"
 import { LocalizarClientes } from "../../application/useCases/LocalizarClientes"
 import { AppError } from "../../shared/errors/AppError"
 import { EventRepository } from "../../domain/repositories/EventRepository"
+import { EmailGateway } from "../../gateways/email.gateways"
 
 
 export class ClienteController {
   constructor(
-    private repository: EventRepository
+    private repository: EventRepository,
+    private emailGateway: EmailGateway
   ) { }
 
   async criarCliente(req: Request, res: Response) {
     try {
-      const usecase = new CriarCliente(this.repository)
+      const usecase = new CriarCliente(this.repository, this.emailGateway)
 
       const aggregate_id = await usecase.execute(req.body)
 

@@ -115,7 +115,7 @@ export class Cliente {
             event_type: EventTypes.DIVIDA_REGISTRADA,
             event_data: {
                 valor: valor,
-                descricao: descricao                
+                descricao: descricao
             }
         };
     }

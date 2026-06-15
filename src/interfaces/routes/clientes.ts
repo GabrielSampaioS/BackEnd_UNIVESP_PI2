@@ -2,12 +2,14 @@ import express from "express"
 
 import { ClienteController } from "../controllers/ClienteController"
 import { MongoEventRepository } from "../../infrastructure/repositories/MongoEventRepository"
+import { EmailGateway } from "../../gateways/email.gateways"
 
 const router = express.Router()
 
 const repository = new MongoEventRepository()
+const emailGateway = new EmailGateway()
 
-const clienteController = new ClienteController(repository)
+const clienteController = new ClienteController(repository, emailGateway)
 
 router.post(
   "/clientes",
