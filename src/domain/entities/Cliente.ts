@@ -1,6 +1,7 @@
 import { CriarClienteDTO } from "../../application/dto/CriarClienteDTO";
 import { AppError } from "../../shared/errors/AppError";
 import { FormaPagamento } from "../enums/FormaPagamento";
+import { DomainEvent } from "../events/DomainEvent";
 import { EventTypes } from "../events/EventTypes";
 
 export class Cliente {
@@ -13,9 +14,9 @@ export class Cliente {
     cpf = "";
     email = "";
 
-    private events: any[] = [];
+    private events: DomainEvent[] = [];
 
-    static rehydrate(events: any[]): Cliente {
+    static rehydrate(events: DomainEvent[]): Cliente {
 
         const cliente = new Cliente();
 
@@ -109,13 +110,6 @@ export class Cliente {
 
         }
 
-        //todo: validar campo dedscrição que pode ser null
-
-
-        //adicionar evento na variavel private events
-        //this.addEvent({ event_type: EventTypes.DIVIDA_REGISTRADA, event_data: { valor: valor, descricao: descricao }, created_at: new Date() });
-
-
         return {
             event_type: EventTypes.DIVIDA_REGISTRADA,
             event_data: {
@@ -148,33 +142,30 @@ export class Cliente {
             );
         }
 
-        let taxaPercentual = 0;
+        let taxa_percentual = 0;
 
         switch (forma_pagamento) {
             case FormaPagamento.CREDITO:
-                taxaPercentual = 5;
+                taxa_percentual = 5;
                 break;
 
             case FormaPagamento.PIX:
             case FormaPagamento.DINHEIRO:
-                taxaPercentual = 0;
+                taxa_percentual = 0;
                 break;
         }
 
-        const valorTaxa = valor * (taxaPercentual / 100);
+        const valor_taxa = valor * (taxa_percentual / 100);
 
-        const event = {
-            event_type: EventTypes.PAGAMENTO_EFETUADO,
-            event_data: {
+        const valor_pago_cliente = valor + valor_taxa;
+
+        return {
                 valor_abatido: valor,
-                forma_pagamento: forma_pagamento,
-                taxa_percentual: taxaPercentual,
-                valor_taxa: valorTaxa,
-                valor_pago_cliente: valor + valorTaxa
-            },
-        };
+                forma_pagamento,
+                taxa_percentual,
+                valor_taxa,
+                valor_pago_cliente
+            }
 
-
-        return event;
+        }
     }
-}

@@ -1,47 +1,51 @@
 import { EventRepository } from "../../domain/repositories/EventRepository";
 import { Cliente } from "../../domain/entities/Cliente";
 import { AppError } from "../../shared/errors/AppError";
+import { DomainEvent } from "../../domain/events/DomainEvent";
+import { EventTypes } from "../../domain/events/EventTypes";
 
 export class RegistrarDivida {
 
   constructor(private repository: EventRepository) { }
 
   async execute(aggregate_id: string, valor: number, descricao: string): Promise<void> {
+    try {
+      const events = await this.repository.findByAggregateId(aggregate_id);
 
-    const events = await this.repository.findByAggregateId(aggregate_id);
+      if (!events || events.length === 0) {
+        throw new AppError(
+          "Cliente não encontrado",
+          404,
+          "CLIENT_NOT_FOUND"
+        );
+      }
 
-    if (!events || events.length === 0) {
+      const cliente = Cliente.rehydrate(events);
 
-      throw new AppError(
-        "Cliente não encontrado",
-        404,
-        "CLIENT_NOT_FOUND"
-      );
-
-    }
-
-    const cliente =
-      Cliente.rehydrate(events);
-
-    const event =
       cliente.registrarDivida(valor, descricao);
 
-    try {
-
-      await this.repository.save({
+      const event: DomainEvent = {
         aggregate_id,
-        ...event,
+        event_type: EventTypes.DIVIDA_REGISTRADA,
+        event_data: {
+          valor,
+          descricao
+        },
         created_at: new Date()
-      });
+      };
 
-    } catch {
+      await this.repository.save(event);
+
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
 
       throw new AppError(
         "Erro ao registrar dívida",
         500,
         "INTERNAL_SERVER_ERROR"
       );
-
     }
   }
 }

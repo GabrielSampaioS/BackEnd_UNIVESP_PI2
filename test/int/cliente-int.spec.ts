@@ -480,9 +480,9 @@ describe("CriarCliente - envio de e-mail", () => {
 
         assert.deepStrictEqual(email, [{
             remetente: "no-reply@mercado.com",
-            destinatario: "João",
+            destinatario: "joao@email.com",
             assunto: "Usuário cadastrado",
-            mensagem: "Recebemos a solocitação de cadastro para o seu usuário"
+            mensagem: "Recebemos sua solicitação de cadastro"
         }])
     })
 
