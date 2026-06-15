@@ -13,8 +13,15 @@ import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
 import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
 
 import { SyntheticDataGenerator } from "./SyntheticDataGenerator"
+import { mock } from "node:test"
 
 dotenv.config()
+
+function createEmailGatewayMock() {
+    return {
+        sendEmail: mock.fn(async () => { })
+    };
+}
 
 async function main() {
 
@@ -22,8 +29,9 @@ async function main() {
     //1) const repo = new MongoEventRepository()
     
     const repo = new ExcelEventRepository()
+    const serveceEmailMock = createEmailGatewayMock()
 
-    const criarCliente = new CriarCliente(repo)
+    const criarCliente = new CriarCliente(repo, serveceEmailMock)
     const registrarDivida = new RegistrarDivida(repo)
     const registrarPagamento = new RegistrarPagamento(repo)
 
