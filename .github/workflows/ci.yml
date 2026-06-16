@@ -85,7 +85,7 @@ test-integration-and-e2e:
       run: sleep 10
 
     - name: Run integration tests
-      run: npm run test:int-concurrency1
+      run: npm run test:int
 
     - name: Run e2e tests
-      run: npm run test:e2e-concurrency1
+      run: npm run test:e2e
