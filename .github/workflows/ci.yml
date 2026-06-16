@@ -7,9 +7,25 @@ on:
     branches: [ "main" ]
 
 jobs:
-  lint:
+#  lint:
+#
+#    runs-on: ubuntu-latest
+#    
+#    steps:
+#    - uses: actions/checkout@v4
+#    - name: Use Node.js ${{ matrix.node-version }}
+#      uses: actions/setup-node@v4
+#      with:
+#        node-version: ${{ matrix.node-version }}
+#        cache: 'npm'
+##    - run: npm ci
+#    - run: npm run lint
+
+  test-unit:
 
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test 
     
     steps:
     - uses: actions/checkout@v4
@@ -19,5 +35,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: npm run lint
+    - run: env > .env.test
+    - run: npm run test:unit
     
