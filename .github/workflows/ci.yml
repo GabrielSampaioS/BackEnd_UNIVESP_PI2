@@ -46,3 +46,46 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit
+
+test-integration-and-e2e:
+  runs-on: ubuntu-latest
+
+  services:
+    mongo:
+      image: mongo:7
+      ports:
+        - 27017:27017
+      env:
+        MONGO_INITDB_ROOT_USERNAME: admin
+        MONGO_INITDB_ROOT_PASSWORD: admin
+
+  env:
+    NODE_ENV: test
+    MONGO_URI: mongodb://admin:admin@localhost:27017/barDaFiloTest?authSource=admin
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Create .env
+      run: |
+        echo "NODE_ENV=test" > .env
+        echo "MONGO_URI=mongodb://admin:admin@localhost:27017/barDaFiloTest?authSource=admin" >> .env
+
+    - name: Wait MongoDB
+      run: sleep 10
+
+    - name: Run integration tests
+      run: npm run test:int-concurrency1
+
+    - name: Run e2e tests
+      run: npm run test:e2e-concurrency1
