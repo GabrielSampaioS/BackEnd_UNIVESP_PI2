@@ -85,7 +85,7 @@ jobs:
         run: sleep 10
 
       - name: Run integration tests
-        run: npm run test:int
+        run: npm run test:int-concurrency1
 
       - name: Run e2e tests
-        run: npm run test:e2e
+        run: npm run test:e2e-concurrency1
