@@ -1,3 +1,5 @@
+//TODO: Atualizar ReadMe
+
 # Bar da Filó — API de Controle de Fiado (Event Sourcing + DDD)
 
 ## Visão Geral
