@@ -150,10 +150,10 @@ export class Cliente {
 
         return {
             valor_abatido: valor,
-            forma_pagamento,
-            taxaPercentual,
-            valor_taxa,
-            valorPagoCliente
+            forma_pagamento: forma_pagamento,
+            taxa_percentual: taxaPercentual,
+            valor_taxa: valor_taxa,
+            valor_pago_cliente: valorPagoCliente
         }
 
     }
