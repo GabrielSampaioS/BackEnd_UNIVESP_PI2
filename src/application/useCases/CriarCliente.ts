@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid"
-import { EventRepository } from "../../domain/repositories/EventRepository"
+import { EventStore } from "../../domain/repositories/EventRepository"
 import { EventTypes } from "../../domain/events/EventTypes"
 import { Cliente } from "../../domain/entities/Cliente"
 import { EmailService } from "../../domain/repositories/EmailService"
@@ -9,7 +9,7 @@ import { AppError } from "../../shared/errors/AppError"
 
 export class CriarCliente {
 
-    constructor(private repository: EventRepository, private emailService: EmailService) { }
+    constructor(private repository: EventStore, private emailService: EmailService) { }
 
     async execute(data: CriarClienteDTO) {
         try {

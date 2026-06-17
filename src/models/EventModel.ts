@@ -7,6 +7,7 @@ export interface EventDocument extends Document {
 
     event_type: EventTypes
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event_data: any //DomainEvent?
 
     created_at: Date

@@ -1,4 +1,4 @@
-import { EventRepository } from "../../domain/repositories/EventRepository";
+import { EventStore } from "../../domain/repositories/EventRepository";
 import { Cliente } from "../../domain/entities/Cliente";
 import { AppError } from "../../shared/errors/AppError";
 import { DomainEvent } from "../../domain/events/DomainEvent";
@@ -6,7 +6,7 @@ import { EventTypes } from "../../domain/events/EventTypes";
 
 export class RegistrarDivida {
 
-  constructor(private repository: EventRepository) { }
+  constructor(private repository: EventStore) { }
 
   async execute(aggregate_id: string, valor: number, descricao: string): Promise<void> {
     try {

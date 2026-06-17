@@ -1,8 +1,10 @@
 import { DomainEvent } from "../../domain/events/DomainEvent"
 import ExcelJS from "exceljs"
-import { EventRepository } from "../../domain/repositories/EventRepository"
 
-export class ExcelEventRepository implements EventRepository{
+import { EventStore } from "../../domain/repositories/EventRepository"
+import { EventTypes } from "../../domain/events/EventTypes"
+
+export class ExcelEventRepository implements EventStore {
 
     private workbook: ExcelJS.Workbook
     private sheet: ExcelJS.Worksheet
@@ -20,12 +22,41 @@ export class ExcelEventRepository implements EventRepository{
             { header: "event_data", key: "event_data" }
         ]
     }
+    async findByAggregateId(id: string): Promise<DomainEvent[]> {
+
+        //Funciona ? 
+        //TODO: Criar um excel e salvar
+        if (this.rowBuffer.length) {
+            this.flush();
+        }
+
+        const events: DomainEvent[] = [];
+
+        this.sheet.eachRow((row, rowNumber) => {
+            if (rowNumber === 1) return; // cabeçalho
+
+            if (row.getCell(1).value === id) {
+                events.push({
+                    aggregate_id: String(row.getCell(1).value),
+                    event_type: row.getCell(2).value as EventTypes,
+                    created_at: new Date(
+                        row.getCell(3).value as string
+                    ),
+                    event_data: JSON.parse(
+                        String(row.getCell(4).value)
+                    )
+                });
+            }
+        });
+
+        return events;
+    }
 
 
     async save(event: DomainEvent): Promise<void> {
         this.rowBuffer.push(event)
         if (this.rowBuffer.length >= this.BATCH_SIZE) {
-            this.flush()
+            await this.flush()
         }
     }
 
@@ -40,26 +71,13 @@ export class ExcelEventRepository implements EventRepository{
         }
         this.rowBuffer = []
     }
-    
+
     async close(fileName = "event.xlsx") {
         if (this.rowBuffer.length) {
             this.flush()
         }
 
         await this.workbook.xlsx.writeFile(fileName)
-    }
-
-
-    // ---------------- NÃO IMPLEMENTADOS ----------------
-    // Problema com L do SOLID
-    findByAggregateId(id: string): Promise<DomainEvent[]> {
-        throw new Error("Method not implemented.")
-    }
-    findClientes(query: any): Promise<DomainEvent[]> {
-        throw new Error("Method not implemented.")
-    }
-    findByNameOrCpf(nome?: string, cpf?: string): Promise<DomainEvent[]> {
-        throw new Error("Method not implemented.")
     }
 
 }

@@ -4,6 +4,7 @@ import { DomainEvent } from "../../domain/events/DomainEvent"
 
 export class MongoEventRepository implements EventRepository {
     findByNameOrCpf(nome?: string, cpf?: string): Promise<DomainEvent[]> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const query: any = {
             event_type: "ClienteCadastrado"
         }
@@ -29,6 +30,7 @@ export class MongoEventRepository implements EventRepository {
     findByAggregateId(id: string): Promise<DomainEvent[]> {
         return EventModel.find({ aggregate_id: id }).sort({ created_at: 1 })
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     findClientes(query: any): Promise<DomainEvent[]> {
         return EventModel.find(query)
 

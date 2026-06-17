@@ -1,8 +1,8 @@
-import { EventRepository } from "../../domain/repositories/EventRepository";
+import { EventReader } from "../../domain/repositories/EventRepository";
 import { AppError } from "../../shared/errors/AppError";
 
 export class LocalizarClientes {
-    constructor(private repository: EventRepository) { }
+    constructor(private repository: EventReader) { }
 
     async execute(nome?: string, cpf?: string) {
         try {

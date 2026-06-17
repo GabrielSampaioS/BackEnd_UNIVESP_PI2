@@ -1,10 +1,10 @@
-import { EventRepository } from "../../domain/repositories/EventRepository";
+import { EventReader } from "../../domain/repositories/EventRepository";
 import { Cliente } from "../../domain/entities/Cliente";
 import { AppError } from "../../shared/errors/AppError";
 
 export class ObterHistorico {
 
-    constructor(private repository: EventRepository) { }
+    constructor(private repository: EventReader) { }
 
     async execute(aggregate_id: string) {
         try {

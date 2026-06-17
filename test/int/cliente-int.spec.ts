@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 //lib para testes
 import test, { after, before, beforeEach, describe, mock } from "node:test";
 import assert from "node:assert";
