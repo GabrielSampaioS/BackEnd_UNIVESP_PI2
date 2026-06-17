@@ -3,6 +3,7 @@ import { AppError } from "../../shared/errors/AppError";
 import { FormaPagamento } from "../enums/FormaPagamento";
 import { DomainEvent } from "../events/DomainEvent";
 import { EventTypes } from "../events/EventTypes";
+import { TaxaStrategyFactory } from "../strategies/TaxaStrategyFactory";
 
 export class Cliente {
 
@@ -142,30 +143,18 @@ export class Cliente {
             );
         }
 
-        let taxa_percentual = 0;
-
-        switch (forma_pagamento) {
-            case FormaPagamento.CREDITO:
-                taxa_percentual = 5;
-                break;
-
-            case FormaPagamento.PIX:
-            case FormaPagamento.DINHEIRO:
-                taxa_percentual = 0;
-                break;
-        }
-
-        const valor_taxa = valor * (taxa_percentual / 100);
-
-        const valor_pago_cliente = valor + valor_taxa;
+        const taxaStrategy = TaxaStrategyFactory.criar(forma_pagamento)
+        const taxaPercentual = taxaStrategy.obterTaxaPercentual();
+        const valor_taxa = taxaStrategy.calcularTaxa(valor)
+        const valorPagoCliente = taxaStrategy.calcularValorTotal(valor);
 
         return {
-                valor_abatido: valor,
-                forma_pagamento,
-                taxa_percentual,
-                valor_taxa,
-                valor_pago_cliente
-            }
-
+            valor_abatido: valor,
+            forma_pagamento,
+            taxaPercentual,
+            valor_taxa,
+            valorPagoCliente
         }
+
     }
+}
