@@ -22,7 +22,7 @@
     "dotenv": "^17.2.2",
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
-    "mongoose": "^8.18.0",
+    "mongoose": "^9.7.1",
     "sequelize": "^6.37.7",
     "uuid": "^14.0.0"
   },
