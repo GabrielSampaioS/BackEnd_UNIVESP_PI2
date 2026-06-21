@@ -7,21 +7,27 @@ import criarApp from "./app";
 
 import { MongoEventRepository } from "../infrastructure/repositories/MongoEventRepository";
 import { EmailGateway } from "../gateways/email.gateways";
+import { connectDatabase } from "../infrastructure/database/mongoose";
 
 dotenv.config();
 
+async function start() {
+    await connectDatabase();
+    // Implemnetção real das interfaces
+    const eventRepository = new MongoEventRepository();
+    const emailService = new EmailGateway();
 
-// Implemnetção real das interfaces
-const eventRepository = new MongoEventRepository();
-const emailService = new EmailGateway();
+    const app = criarApp({ eventRepository, emailService });
 
-const app = criarApp({eventRepository, emailService});
+    app.listen(
+        process.env.PORT ?? 3000,
+        () => {
+            console.log(`Servidor rodando na porta ${process.env.PORT ?? 3000}`);
 
-app.listen(
-    process.env.PORT ?? 3000,
-    () => {
-        console.log(`Servidor rodando na porta ${process.env.PORT ?? 3000}`);
+        }
+    );
 
-    }
-);
+}
 
+
+start();

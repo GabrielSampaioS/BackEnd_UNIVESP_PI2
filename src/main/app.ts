@@ -13,7 +13,7 @@ import { EmailService } from "../domain/repositories/EmailService";
 // Inicialização do app
 // =======================
 export default function criarApp({ eventRepository, emailService }: { eventRepository: EventRepository, emailService: EmailService }) {
-
+    
     const app = express();
 
     app.use(cors());
