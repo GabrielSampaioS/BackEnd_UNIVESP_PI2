@@ -5,7 +5,7 @@ dotenv.config()
 
 export async function connectDatabase() {
 
-  const uri = process.env.MONGO_URI || "mongodb://localhost:27017/barDaFilo"
+  const uri = process.env.MONGO_URI || "mongodb://localhost:27017/db_test_mongo"
 
   try {
 
