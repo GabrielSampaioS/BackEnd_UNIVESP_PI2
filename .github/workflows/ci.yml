@@ -108,3 +108,18 @@ jobs:
 
       - name: Build application
         run: npm run build 
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: imageApi
+          path: main
+ 
+  docker:
+    needs: build
+    uses: ./.github/workflows/Docker.yml
+    secrets: inherit
+
+    
+
+    
