@@ -1,9 +1,8 @@
-import { CriarClienteDTO } from "../../application/dto/CriarClienteDTO";
-import { AppError } from "../../shared/errors/AppError";
 import { FormaPagamento } from "../enums/FormaPagamento";
 import { DomainEvent } from "../events/DomainEvent";
 import { EventTypes } from "../events/EventTypes";
 import { TaxaStrategyFactory } from "../strategies/TaxaStrategyFactory";
+import { ClienteValidador } from "../validators/ClienteValidador";
 
 export class Cliente {
 
@@ -15,13 +14,13 @@ export class Cliente {
     cpf = "";
     email = "";
 
-    private events: DomainEvent[] = [];
+    private readonly events: DomainEvent[] = [];
 
     static rehydrate(events: DomainEvent[]): Cliente {
 
         const cliente = new Cliente();
 
-        cliente.events = events;
+        cliente.events.push(...events)
 
         for (const event of events) {
 
@@ -34,7 +33,6 @@ export class Cliente {
                     cliente.telefone = event.event_data.telefone;
                     cliente.cpf = event.event_data.cpf;
                     cliente.email = event.event_data.email;
-
                     break;
             }
         }
@@ -42,40 +40,40 @@ export class Cliente {
         return cliente;
     }
 
-    static sanitizarCadastro(data: CriarClienteDTO): CriarClienteDTO {
+    static registrarDivida(valor: number, descricao: string = "") {
+
+        ClienteValidador.validarDivida(valor)
+
         return {
-            nome: data.nome.trim(),
-            sobrenome: data.sobrenome.trim(),
-            telefone: data.telefone.trim(),
-            cpf: data.cpf.trim(),
-            email: data.email.trim()
-        }
+            event_type: EventTypes.DIVIDA_REGISTRADA,
+            event_data: {
+                valor: valor,
+                descricao: descricao
+            }
+        };
     }
 
-    static validarCadastro(data: CriarClienteDTO): void {
+    static registrarPagamento(valor: number, forma_pagamento: FormaPagamento) {
 
-        const camposObrigatorios: (keyof CriarClienteDTO)[] = [
-            "nome",
-            "sobrenome",
-            "telefone",
-            "cpf",
-            "email"
-        ];
+        ClienteValidador.validarPagamento(valor, forma_pagamento)
 
-        for (const campo of camposObrigatorios) {
-            if (!data[campo]) {
-                throw new AppError(
-                    `Campo ${campo} é obrigatório`,
-                    400,
-                    "INVALID_DATA"
-                );
-            }
 
+        const taxaStrategy = TaxaStrategyFactory.criar(forma_pagamento)
+        const taxaPercentual = taxaStrategy.obterTaxaPercentual();
+        const valor_taxa = taxaStrategy.calcularTaxa(valor)
+        const valorPagoCliente = taxaStrategy.calcularValorTotal(valor);
+
+        return {
+            valor_abatido: valor,
+            forma_pagamento: forma_pagamento,
+            taxa_percentual: taxaPercentual,
+            valor_taxa: valor_taxa,
+            valor_pago_cliente: valorPagoCliente
         }
+
     }
 
     getSaldo(): number {
-
         let saldo = 0;
 
         for (const event of this.events) {
@@ -98,63 +96,7 @@ export class Cliente {
         return saldo;
     }
 
-    //TODO: registrarDivida e registrarPagamento deve ser uma função apenas 
-    registrarDivida(valor: number, descricao: string = "") {
-
-        if (!valor || valor <= 0) {
-
-            throw new AppError(
-                "Valor inválido",
-                400,
-                "INVALID_DATA"
-            );
-
-        }
-
-        return {
-            event_type: EventTypes.DIVIDA_REGISTRADA,
-            event_data: {
-                valor: valor,
-                descricao: descricao
-            }
-        };
-    }
-
-    registrarPagamento(
-        valor: number,
-        forma_pagamento: FormaPagamento
-    ) {
-
-        // Validar valor
-        if (!valor || valor <= 0) {
-            throw new AppError(
-                "Valor inválido",
-                400,
-                "INVALID_DATA"
-            );
-        }
-
-        // Validar forma de pagamento
-        if (!Object.values(FormaPagamento).includes(forma_pagamento)) {
-            throw new AppError(
-                "Forma de pagamento inválida",
-                400,
-                "INVALID_DATA"
-            );
-        }
-
-        const taxaStrategy = TaxaStrategyFactory.criar(forma_pagamento)
-        const taxaPercentual = taxaStrategy.obterTaxaPercentual();
-        const valor_taxa = taxaStrategy.calcularTaxa(valor)
-        const valorPagoCliente = taxaStrategy.calcularValorTotal(valor);
-
-        return {
-            valor_abatido: valor,
-            forma_pagamento: forma_pagamento,
-            taxa_percentual: taxaPercentual,
-            valor_taxa: valor_taxa,
-            valor_pago_cliente: valorPagoCliente
-        }
-
-    }
 }
+
+
+

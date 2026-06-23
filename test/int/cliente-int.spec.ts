@@ -43,7 +43,8 @@ function createEmailGatewayMock() {
         sendEmail: mock.fn(async () => { })
     };
 }
-
+const repository = new MongoEventRepository();
+const emailGatewayMock = createEmailGatewayMock();
 
 describe("Integração - UseCase + Repository", () => {
 
@@ -51,8 +52,7 @@ describe("Integração - UseCase + Repository", () => {
     test("deve criar cliente e persistir no MongoDB", async () => {
 
         //arrange
-        const repository = new MongoEventRepository();
-        const emailGatewayMock = createEmailGatewayMock();
+
         const sut = new CriarCliente(repository, emailGatewayMock);
 
 
@@ -75,9 +75,6 @@ describe("Integração - UseCase + Repository", () => {
     test("deve registrar dívida e pagamento e calcular saldo corretamente", async () => {
 
         //arrange
-        const repository = new MongoEventRepository();
-        const emailGatewayMock = createEmailGatewayMock();
-
         const criarClienteUseCase = new CriarCliente(repository, emailGatewayMock);
         const registrarDividaUsecase = new RegistrarDivida(repository)
         const registrarPagamentoUsecase = new RegistrarPagamento(repository)
@@ -120,10 +117,7 @@ describe("Controller", () => {
     Teste com baixa redistencia a refotação por causa dos Spy, a troca de json para send, mesmo que não mudaria o resultado final, o teste vai falhar
     */
     test("criarCliente deve retornar status 201", async () => {
-
-
-        const repository = new MongoEventRepository();
-        const emailGatewayMock = createEmailGatewayMock();
+        
         const sut = new ClienteController(repository, emailGatewayMock);
 
         // Arrange
@@ -184,20 +178,18 @@ describe("Controller", () => {
 
     test("registrarDivida deve retornar status 201", async () => {
 
-        const repository = new MongoEventRepository();
-        const emailGateway = createEmailGatewayMock();
 
         const controller =
             new ClienteController(
                 repository,
-                emailGateway
+                emailGatewayMock
             );
 
         // Arrange
         const criarCliente =
             new CriarCliente(
                 repository,
-                emailGateway
+                emailGatewayMock
             );
 
 
@@ -259,12 +251,10 @@ describe("Controller", () => {
 
     test("registrarPagamento deve retornar status 201", async () => {
 
-        const repository = new MongoEventRepository();
-        const emailGateway = createEmailGatewayMock();
 
-        const controller = new ClienteController(repository, emailGateway);
+        const controller = new ClienteController(repository, emailGatewayMock);
 
-        const criarCliente = new CriarCliente(repository, emailGateway);
+        const criarCliente = new CriarCliente(repository, emailGatewayMock);
 
         const registrarDivida = new RegistrarDivida(repository);
 
@@ -322,19 +312,17 @@ describe("Controller", () => {
 
     test("obterHistorico deve retornar status 200 e lista de eventos", async () => {
 
-        const repository = new MongoEventRepository();
-        const emailGateway = createEmailGatewayMock();
 
         const controller =
             new ClienteController(
                 repository,
-                emailGateway
+                emailGatewayMock
             );
 
         const criarCliente =
             new CriarCliente(
                 repository,
-                emailGateway
+                emailGatewayMock
             );
 
 
@@ -381,19 +369,16 @@ describe("Controller", () => {
 
     test("localizarUser deve retornar clientes encontrados", async () => {
 
-        const repository = new MongoEventRepository();
-        const emailGateway = createEmailGatewayMock();
-
         const controller =
             new ClienteController(
                 repository,
-                emailGateway
+                emailGatewayMock
             );
 
         const criarCliente =
             new CriarCliente(
                 repository,
-                emailGateway
+                emailGatewayMock
             );
 
         const dados = createClienteDTO()
@@ -464,8 +449,6 @@ describe("CriarCliente - envio de e-mail", () => {
     test("deve enviar um e-mail após criar cliente", async () => {
 
         //arrange
-        const repository = new MongoEventRepository();
-        const emailGatewayMock = createEmailGatewayMock()
         const sut = new CriarCliente(repository, emailGatewayMock);
 
         //act

@@ -25,9 +25,7 @@ export class RegistrarPagamento {
                 );
             }
 
-            const cliente = Cliente.rehydrate(events);
-
-            const domainEvent = cliente.registrarPagamento(valor, forma_pagamento);
+            const domainEvent = Cliente.registrarPagamento(valor, forma_pagamento);
 
             const event: DomainEvent = {
                 aggregate_id,

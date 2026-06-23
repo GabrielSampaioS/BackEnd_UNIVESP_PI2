@@ -20,9 +20,9 @@ export class RegistrarDivida {
         );
       }
 
-      const cliente = Cliente.rehydrate(events);
+      //const cliente = Cliente.rehydrate(events);
 
-      cliente.registrarDivida(valor, descricao);
+      Cliente.registrarDivida(valor, descricao);
 
       const event: DomainEvent = {
         aggregate_id,
