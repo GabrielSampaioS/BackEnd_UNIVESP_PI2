@@ -19,7 +19,7 @@ jobs:
         name: imageApi    
 
     - name: Docker Login
-      uses: docker/login-actions@v2.0.0
+      uses: docker/login-action@v4.2.0
       with:
         username: gabrielsantoss
         password: ${ secrets.PASSWORD_DOCKER_HUB }}
