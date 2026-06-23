@@ -1,15 +1,20 @@
 import test, { describe } from "node:test";
 import assert from "node:assert";
+import { v4 as uuidv4 } from "uuid"
+
 
 import { Cliente } from "../../src/domain/entities/Cliente";
 import { EventTypes } from "../../src/domain/events/EventTypes";
+import { DomainEvent } from "../../src/domain/events/DomainEvent";
+import { FormaPagamento } from "../../src/domain/enums/FormaPagamento";
+import { ClienteValidador } from "../../src/domain/validators/ClienteValidador";
 
 describe("Cliente", () => {
 
     test("validarCadastro não deve lançar erro para dados válidos", () => {
         assert.doesNotThrow(() => {
 
-            Cliente.validarCadastro({
+            ClienteValidador.validarCadastro({
                 nome: "Gabriel",
                 sobrenome: "Sampaio",
                 telefone: "19999999999",
@@ -30,15 +35,26 @@ describe("Cliente", () => {
             cpf: "12345678900",
             email: "gabriel@email.com"
         };
+        const aggregate_id = uuidv4();
 
         //act
-        Cliente.validarCadastro(dadosValidos);
-        const cliente = Cliente.rehydrate([
-            {
-                event_type: EventTypes.CLIENTE_CADASTRADO,
-                event_data: dadosValidos
-            }
-        ]);
+        ClienteValidador.validarCadastro(dadosValidos);
+
+        const event: DomainEvent = {
+            aggregate_id,
+            event_type: EventTypes.CLIENTE_CADASTRADO,
+            event_data: {
+                nome: dadosValidos.nome,
+                sobrenome: dadosValidos.sobrenome,
+                telefone: dadosValidos.telefone,
+                cpf: dadosValidos.cpf,
+                email: dadosValidos.email
+            },
+            created_at: new Date()
+        };
+
+
+        const cliente = Cliente.rehydrate([event]);
 
         //assert
         assert.strictEqual(dadosValidos.nome, cliente.nome);
@@ -54,7 +70,7 @@ describe("Cliente", () => {
 
         assert.throws(() => {
 
-            Cliente.validarCadastro({
+            ClienteValidador.validarCadastro({
                 nome: "",
                 sobrenome: "Sampaio",
                 telefone: "19999999999",
@@ -62,26 +78,13 @@ describe("Cliente", () => {
                 email: "gabriel@email.com"
             });
 
-        } , {message: 'Campo nome é obrigatório'});
+        }, { message: 'Campo nome é obrigatório' });
 
     });
 
     test("registrarDivida deve gerar evento DIVIDA_REGISTRADA com o valor informado", () => {
 
-        const cliente = Cliente.rehydrate([
-            {
-                event_type: EventTypes.CLIENTE_CADASTRADO,
-                event_data: {
-                    nome: "Gabriel",
-                    sobrenome: "Sampaio",
-                    telefone: "19999999999",
-                    cpf: "12345678900",
-                    email: "gabriel@email.com"
-                }
-            }
-        ]);
-
-        const event = cliente.registrarDivida(50, "Pão");
+        const event = Cliente.registrarDivida(50, "Pão");
 
 
         assert.strictEqual(
@@ -100,32 +103,18 @@ describe("Cliente", () => {
     });
 
     test("registrarDivida deve lançar erro quando o valor for menor ou igual a zero", () => {
-
-        const cliente = Cliente.rehydrate([
-            {
-                event_type: EventTypes.CLIENTE_CADASTRADO,
-                event_data: {
-                    nome: "Gabriel",
-                    sobrenome: "Sampaio",
-                    telefone: "19999999999",
-                    cpf: "12345678900",
-                    email: "gabriel@email.com"
-                }
-            }
-        ]);
-
-        assert.throws(() => {
-
-            cliente.registrarDivida(0)
-
-        }, {message: "Valor inválido"});
+        assert.throws(
+            () => Cliente.registrarDivida(0, "teste"),
+            { message: "Valor inválido" });
 
     });
 
     test("rehydrate deve calcular o saldo a partir da sequência de eventos de dívida e pagamento", () => {
+        const aggregate_id = uuidv4();
 
         const cliente = Cliente.rehydrate([
             {
+                aggregate_id: aggregate_id,
                 event_type: EventTypes.CLIENTE_CADASTRADO,
                 event_data: {
                     nome: "Gabriel",
@@ -133,31 +122,38 @@ describe("Cliente", () => {
                     telefone: "19999999999",
                     cpf: "12345678900",
                     email: "gabriel@email.com"
-                }
+                },
+                created_at: new Date()
             },
             {
+                aggregate_id: aggregate_id,
                 event_type: EventTypes.DIVIDA_REGISTRADA,
                 event_data: {
-                    valor: 100
-                }
+                    valor: 100,
+                    descricao: "teste"
+                },
+                created_at: new Date()
             },
             {
+                aggregate_id: aggregate_id,
                 event_type: EventTypes.DIVIDA_REGISTRADA,
                 event_data: {
                     valor: 50,
-                    forma_pagamento : "PIX"
-
-                }
+                    descricao: "teste"
+                },
+                created_at: new Date()
             },
             {
+                aggregate_id: aggregate_id,
                 event_type: EventTypes.PAGAMENTO_EFETUADO,
                 event_data: {
                     valor_abatido: 20,
-                    forma_pagamento: "PIX",
+                    forma_pagamento: FormaPagamento.PIX,
                     taxa_percentual: 0,
                     valor_taxa: 0,
                     valor_pago_cliente: 20 + 0
-                }
+                },
+                created_at: new Date()
             }
         ]);
 
