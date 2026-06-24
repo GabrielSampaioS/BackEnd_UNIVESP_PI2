@@ -1,4 +1,4 @@
-export enum EventTypes {
+export enum ClienteEventTypes  {
 
   CLIENTE_CADASTRADO = "ClienteCadastrado",
 

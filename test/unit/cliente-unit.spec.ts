@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 
 
 import { Cliente } from "../../src/domain/entities/Cliente";
-import { EventTypes } from "../../src/domain/events/EventTypes";
+import { ClienteEventTypes } from "../../src/domain/events/EventTypes";
 import { DomainEvent } from "../../src/domain/events/DomainEvent";
 import { FormaPagamento } from "../../src/domain/enums/FormaPagamento";
 import { ClienteValidador } from "../../src/domain/validators/ClienteValidador";
@@ -42,7 +42,7 @@ describe("Cliente", () => {
 
         const event: DomainEvent = {
             aggregate_id,
-            event_type: EventTypes.CLIENTE_CADASTRADO,
+            event_type: ClienteEventTypes.CLIENTE_CADASTRADO,
             event_data: {
                 nome: dadosValidos.nome,
                 sobrenome: dadosValidos.sobrenome,
@@ -89,7 +89,7 @@ describe("Cliente", () => {
 
         assert.strictEqual(
             event.event_type,
-            EventTypes.DIVIDA_REGISTRADA
+            ClienteEventTypes.DIVIDA_REGISTRADA
         );
 
         assert.strictEqual(
@@ -115,7 +115,7 @@ describe("Cliente", () => {
         const cliente = Cliente.rehydrate([
             {
                 aggregate_id: aggregate_id,
-                event_type: EventTypes.CLIENTE_CADASTRADO,
+                event_type: ClienteEventTypes.CLIENTE_CADASTRADO,
                 event_data: {
                     nome: "Gabriel",
                     sobrenome: "Sampaio",
@@ -127,7 +127,7 @@ describe("Cliente", () => {
             },
             {
                 aggregate_id: aggregate_id,
-                event_type: EventTypes.DIVIDA_REGISTRADA,
+                event_type: ClienteEventTypes.DIVIDA_REGISTRADA,
                 event_data: {
                     valor: 100,
                     descricao: "teste"
@@ -136,7 +136,7 @@ describe("Cliente", () => {
             },
             {
                 aggregate_id: aggregate_id,
-                event_type: EventTypes.DIVIDA_REGISTRADA,
+                event_type: ClienteEventTypes.DIVIDA_REGISTRADA,
                 event_data: {
                     valor: 50,
                     descricao: "teste"
@@ -145,7 +145,7 @@ describe("Cliente", () => {
             },
             {
                 aggregate_id: aggregate_id,
-                event_type: EventTypes.PAGAMENTO_EFETUADO,
+                event_type: ClienteEventTypes.PAGAMENTO_EFETUADO,
                 event_data: {
                     valor_abatido: 20,
                     forma_pagamento: FormaPagamento.PIX,

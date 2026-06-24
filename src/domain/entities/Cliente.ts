@@ -1,6 +1,6 @@
 import { FormaPagamento } from "../enums/FormaPagamento";
 import { DomainEvent } from "../events/DomainEvent";
-import { EventTypes } from "../events/EventTypes";
+import { ClienteEventTypes } from "../events/EventTypes";
 import { TaxaStrategyFactory } from "../strategies/TaxaStrategyFactory";
 import { ClienteValidador } from "../validators/ClienteValidador";
 
@@ -26,7 +26,7 @@ export class Cliente {
 
             switch (event.event_type) {
 
-                case EventTypes.CLIENTE_CADASTRADO:
+                case ClienteEventTypes.CLIENTE_CADASTRADO:
 
                     cliente.nome = event.event_data.nome;
                     cliente.sobrenome = event.event_data.sobrenome;
@@ -45,7 +45,7 @@ export class Cliente {
         ClienteValidador.validarDivida(valor)
 
         return {
-            event_type: EventTypes.DIVIDA_REGISTRADA,
+            event_type: ClienteEventTypes.DIVIDA_REGISTRADA,
             event_data: {
                 valor: valor,
                 descricao: descricao
@@ -80,14 +80,14 @@ export class Cliente {
 
             if (
                 event.event_type ===
-                EventTypes.DIVIDA_REGISTRADA
+                ClienteEventTypes.DIVIDA_REGISTRADA
             ) {
                 saldo += Number(event.event_data.valor);
             }
 
             if (
                 event.event_type ===
-                EventTypes.PAGAMENTO_EFETUADO
+                ClienteEventTypes.PAGAMENTO_EFETUADO
             ) {
                 saldo -= Number(event.event_data.valor_abatido);
             }

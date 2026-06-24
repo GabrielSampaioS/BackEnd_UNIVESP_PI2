@@ -1,11 +1,11 @@
 import mongoose, { Schema, Document} from "mongoose";
-import { EventTypes } from "../domain/events/EventTypes";
+import { ClienteEventTypes } from "../domain/events/EventTypes";
 
 export interface EventDocument extends Document {
 
     aggregate_id: string
 
-    event_type: EventTypes
+    event_type: ClienteEventTypes
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event_data: any //DomainEvent?

@@ -1,9 +1,9 @@
-import { EventTypes } from "./EventTypes";
+import { ClienteEventTypes } from "./EventTypes";
 
 export type DomainEvent =
     | {
         aggregate_id: string,
-        event_type: EventTypes.CLIENTE_CADASTRADO;
+        event_type: ClienteEventTypes.CLIENTE_CADASTRADO;
         event_data: {
             nome: string;
             sobrenome: string;
@@ -16,7 +16,7 @@ export type DomainEvent =
 
     | {
         aggregate_id: string,
-        event_type: EventTypes.DIVIDA_REGISTRADA;
+        event_type: ClienteEventTypes.DIVIDA_REGISTRADA;
         event_data: {
             valor: number;
             descricao: string;
@@ -25,7 +25,7 @@ export type DomainEvent =
     }
     | {
         aggregate_id: string,
-        event_type: EventTypes.PAGAMENTO_EFETUADO;
+        event_type: ClienteEventTypes.PAGAMENTO_EFETUADO;
         event_data: {
             valor_abatido: number;
             forma_pagamento: string;

@@ -3,7 +3,7 @@ import { AppError } from "../../shared/errors/AppError";
 import { Cliente } from "../../domain/entities/Cliente";
 import { FormaPagamento } from "../../domain/enums/FormaPagamento";
 import { DomainEvent } from "../../domain/events/DomainEvent";
-import { EventTypes } from "../../domain/events/EventTypes";
+import { ClienteEventTypes } from "../../domain/events/EventTypes";
 
 export class RegistrarPagamento {
     constructor(private repository: EventStore) { }
@@ -29,7 +29,7 @@ export class RegistrarPagamento {
 
             const event: DomainEvent = {
                 aggregate_id,
-                event_type: EventTypes.PAGAMENTO_EFETUADO,
+                event_type: ClienteEventTypes.PAGAMENTO_EFETUADO,
                 event_data: {
                     ...domainEvent
                 },

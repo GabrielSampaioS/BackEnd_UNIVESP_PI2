@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 import { EventStore } from "../../domain/repositories/EventRepository"
-import { EventTypes } from "../../domain/events/EventTypes"
+import { ClienteEventTypes } from "../../domain/events/EventTypes"
 import { EmailService } from "../../domain/repositories/EmailService"
 import { CriarClienteDTO } from "../dto/CriarClienteDTO"
 import { DomainEvent } from "../../domain/events/DomainEvent"
@@ -21,7 +21,7 @@ export class CriarCliente {
 
             const event: DomainEvent = {
                 aggregate_id,
-                event_type: EventTypes.CLIENTE_CADASTRADO,
+                event_type: ClienteEventTypes.CLIENTE_CADASTRADO,
                 event_data: {
                     nome: dadosLimpos.nome,
                     sobrenome: dadosLimpos.sobrenome,
