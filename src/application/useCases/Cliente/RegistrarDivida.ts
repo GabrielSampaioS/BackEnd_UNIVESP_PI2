@@ -1,8 +1,8 @@
-import { EventStore } from "../../domain/repositories/EventRepository";
-import { Cliente } from "../../domain/entities/Cliente";
-import { AppError } from "../../shared/errors/AppError";
-import { DomainEvent } from "../../domain/events/DomainEvent";
-import { EventTypes } from "../../domain/events/EventTypes";
+import { EventStore } from "../../../domain/repositories/EventRepository";
+import { Cliente } from "../../../domain/entities/Cliente";
+import { AppError } from "../../../shared/errors/AppError";
+import { DomainEvent } from "../../../domain/events/DomainEvent";
+import { ClienteEventTypes } from "../../../domain/events/EventTypes";
 
 export class RegistrarDivida {
 
@@ -26,7 +26,7 @@ export class RegistrarDivida {
 
       const event: DomainEvent = {
         aggregate_id,
-        event_type: EventTypes.DIVIDA_REGISTRADA,
+        event_type: ClienteEventTypes.DIVIDA_REGISTRADA,
         event_data: {
           valor,
           descricao

@@ -4,36 +4,41 @@ import { ClienteController } from "../controllers/ClienteController"
 import { EventRepository } from "../../domain/repositories/EventRepository"
 import { EmailService } from "../../domain/repositories/EmailService"
 
+//acoplamento 
+import { authMiddleware } from "../../middlewares/MiddlewareAuth"
+
 
 export default function clienteRoutes({ eventRepository, emailService }: { eventRepository: EventRepository, emailService: EmailService }) {
 
   const router = express.Router()
 
+  router.use(authMiddleware)
+
   const clienteController = new ClienteController(eventRepository, emailService)
 
   router.post(
-    "/clientes",
+    "/",
     clienteController.criarCliente.bind(clienteController)
   )
 
   router.post(
-    "/clientes/:id/dividas",
+    "/:id/dividas",
     clienteController.registrarDivida.bind(clienteController)
   )
 
   router.post(
-    "/clientes/:id/pagamentos",
+    "/:id/pagamentos",
     clienteController.registrarPagamento.bind(clienteController)
   )
 
   router.get(
-    "/clientes/:id/eventos",
+    "/:id/eventos",
     clienteController.obterHistorico.bind(clienteController)
   )
 
   router.get(
-    "/clientes",
-    clienteController.localizarUser.bind(clienteController)
+    "/",
+    clienteController.localizarClientes.bind(clienteController)
   )
   return router;
 }

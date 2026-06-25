@@ -1,4 +1,4 @@
-export enum EventTypes {
+export enum ClienteEventTypes {
 
   CLIENTE_CADASTRADO = "ClienteCadastrado",
 
@@ -6,4 +6,8 @@ export enum EventTypes {
 
   PAGAMENTO_EFETUADO = "PagamentoEfetuado"
 
+}
+
+export enum UserEventTypes {
+  USUARIO_CADASTRADO = "UsuarioCadastrado",
 }

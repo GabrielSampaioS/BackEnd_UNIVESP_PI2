@@ -1,29 +1,35 @@
-import { before, after, describe, test, beforeEach} from "node:test";
+import { before, after, describe, test, beforeEach } from "node:test";
 import mongoose from "mongoose";
 import request from "supertest";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
 import { createAppTest } from "../utils/create-test-app";
+import { getAuthToken } from "../utils/auth";
 
-  before(async () => {
-    await connectDatabase();
-  });
+const { app } = createAppTest()
+let authHeader: string;;
 
-  beforeEach(async () => {
+before(async () => {
+  await connectDatabase();
+});
 
-    const collections = mongoose.connection.collections;
+beforeEach(async () => {
 
-    for (const key in collections) {
-      await collections[key].deleteMany({});
-    }
+  const collections = mongoose.connection.collections;
 
-  });
+  for (const key in collections) {
+    await collections[key].deleteMany({});
+  }
 
-  after(async () => {
-    await mongoose.connection.close();
-  });
+  const token = await getAuthToken(app);
+  authHeader = `Bearer ${token}`;
 
-  const {app} = createAppTest()
+});
+
+after(async () => {
+  await mongoose.connection.close();
+});
+
 
 
 describe("POST /clientes", () => {
@@ -33,6 +39,10 @@ describe("POST /clientes", () => {
     //arrange
     await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel     ",
         sobrenome: "Sampaio",
@@ -56,6 +66,10 @@ describe("POST /clientes", () => {
 
     await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "",
         sobrenome: "",

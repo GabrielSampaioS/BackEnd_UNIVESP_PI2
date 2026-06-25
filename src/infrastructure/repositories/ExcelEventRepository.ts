@@ -2,7 +2,7 @@ import { DomainEvent } from "../../domain/events/DomainEvent"
 import ExcelJS from "exceljs"
 
 import { EventStore } from "../../domain/repositories/EventRepository"
-import { EventTypes } from "../../domain/events/EventTypes"
+import { ClienteEventTypes } from "../../domain/events/EventTypes"
 
 export class ExcelEventRepository implements EventStore {
 
@@ -38,7 +38,7 @@ export class ExcelEventRepository implements EventStore {
             if (row.getCell(1).value === id) {
                 events.push({
                     aggregate_id: String(row.getCell(1).value),
-                    event_type: row.getCell(2).value as EventTypes,
+                    event_type: row.getCell(2).value as ClienteEventTypes,
                     created_at: new Date(
                         row.getCell(3).value as string
                     ),

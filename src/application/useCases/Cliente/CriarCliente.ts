@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid"
-import { EventStore } from "../../domain/repositories/EventRepository"
-import { EventTypes } from "../../domain/events/EventTypes"
-import { EmailService } from "../../domain/repositories/EmailService"
-import { CriarClienteDTO } from "../dto/CriarClienteDTO"
-import { DomainEvent } from "../../domain/events/DomainEvent"
-import { AppError } from "../../shared/errors/AppError"
-import { ClienteSanitizer } from "../../domain/sanitizers/ClienteSanitizer"
-import { ClienteValidador } from "../../domain/validators/ClienteValidador"
+import { EventStore } from "../../../domain/repositories/EventRepository"
+import { ClienteEventTypes } from "../../../domain/events/EventTypes"
+import { EmailService } from "../../../domain/repositories/EmailService"
+import { CriarClienteDTO } from "../../dto/CriarClienteDTO"
+import { DomainEvent } from "../../../domain/events/DomainEvent"
+import { AppError } from "../../../shared/errors/AppError"
+import { Sanitizer } from "../../../domain/sanitizers/Sanitizer"
+import { ClienteValidador } from "../../../domain/validators/ClienteValidador"
 
 export class CriarCliente {
 
@@ -14,14 +14,14 @@ export class CriarCliente {
 
     async execute(data: CriarClienteDTO) {
         try {
-            const dadosLimpos = ClienteSanitizer.sanitizarCadastro(data);
+            const dadosLimpos = Sanitizer.sanitizarCadastroCliente(data);
             ClienteValidador.validarCadastro(dadosLimpos);
             
             const aggregate_id = uuidv4();
 
             const event: DomainEvent = {
                 aggregate_id,
-                event_type: EventTypes.CLIENTE_CADASTRADO,
+                event_type: ClienteEventTypes.CLIENTE_CADASTRADO,
                 event_data: {
                     nome: dadosLimpos.nome,
                     sobrenome: dadosLimpos.sobrenome,

@@ -5,6 +5,11 @@ import request from "supertest";
 import { createAppTest } from "../utils/create-test-app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
+import { getAuthToken } from "../utils/auth";
+
+
+const { app } = createAppTest()
+let authHeader: string;;
 
 before(async () => {
   await connectDatabase();
@@ -18,18 +23,16 @@ beforeEach(async () => {
     await collections[key].deleteMany({});
   }
 
+  const token = await getAuthToken(app);
+  authHeader = `Bearer ${token}`;
+
 });
 
 after(async () => {
   await mongoose.connection.close();
 });
 
-const { app } = createAppTest()
-
-
 describe("POST /clientes/:id/pagamentos", () => {
-
-
 
   test.todo("deve retornar erro ao registrar pagamento com forma de pagamento inválida (400)");
 
@@ -37,6 +40,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -50,6 +57,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const responsePagamento = await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 20,
         forma_pagamento: "PIX"
@@ -70,14 +81,16 @@ describe("POST /clientes/:id/pagamentos", () => {
       responsePagamento.body.data.forma_pagamento,
       "PIX"
     );
-
-
   });
 
   test("deve registrar pagamento para cliente existente no dinheiro (201)", async () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -91,6 +104,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const responsePagamento = await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 50,
         forma_pagamento: "DINHEIRO"
@@ -120,6 +137,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -133,6 +154,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const responsePagamento = await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 100,
         forma_pagamento: "CREDITO"
@@ -160,6 +185,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const response = await request(app)
       .post("/clientes/1/pagamentos")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 20
       })
@@ -176,6 +205,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -189,6 +222,10 @@ describe("POST /clientes/:id/pagamentos", () => {
 
     const response = await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: -20
       })

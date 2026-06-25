@@ -8,9 +8,9 @@ import dotenv from "dotenv"
 import { ExcelEventRepository } from "../../infrastructure/repositories/ExcelEventRepository"
 
  
-import { CriarCliente } from "../../application/useCases/CriarCliente"
-import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
-import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
+import { CriarCliente } from "../../application/useCases/Cliente/CriarCliente"
+import { RegistrarDivida } from "../../application/useCases/Cliente/RegistrarDivida"
+import { RegistrarPagamento } from "../../application/useCases/Cliente/RegistrarPagamento"
 
 import { SyntheticDataGenerator } from "./SyntheticDataGenerator"
 import { mock } from "node:test"

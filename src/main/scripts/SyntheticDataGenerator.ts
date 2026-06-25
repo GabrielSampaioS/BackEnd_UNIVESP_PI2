@@ -1,6 +1,6 @@
-import { CriarCliente } from "../../application/useCases/CriarCliente"
-import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
-import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
+import { CriarCliente } from "../../application/useCases/Cliente/CriarCliente"
+import { RegistrarDivida } from "../../application/useCases/Cliente/RegistrarDivida"
+import { RegistrarPagamento } from "../../application/useCases/Cliente/RegistrarPagamento"
 import { FormaPagamento } from "../../domain/enums/FormaPagamento"
 import { FakeDataGenerator } from "../../main/scripts/Helpers/FakeDataGenerator"
 

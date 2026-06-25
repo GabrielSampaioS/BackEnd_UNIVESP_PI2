@@ -1,5 +1,5 @@
-import { EventReader } from "../../domain/repositories/EventRepository";
-import { AppError } from "../../shared/errors/AppError";
+import { EventReader } from "../../../domain/repositories/EventRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
 export class LocalizarClientes {
     constructor(private repository: EventReader) { }

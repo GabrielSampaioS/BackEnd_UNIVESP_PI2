@@ -1,6 +1,6 @@
-import { EventReader } from "../../domain/repositories/EventRepository";
-import { Cliente } from "../../domain/entities/Cliente";
-import { AppError } from "../../shared/errors/AppError";
+import { EventReader } from "../../../domain/repositories/EventRepository";
+import { Cliente } from "../../../domain/entities/Cliente";
+import { AppError } from "../../../shared/errors/AppError";
 
 export class ObterHistorico {
 

@@ -28,7 +28,11 @@ export class MongoEventRepository implements EventRepository {
         await doc.save()
     }
     findByAggregateId(id: string): Promise<DomainEvent[]> {
-        return EventModel.find({ aggregate_id: id }).sort({ created_at: 1 })
+        return EventModel
+            .find({ aggregate_id: id })
+            .sort({ created_at: 1 })
+            .lean()
+            .exec() as unknown as Promise<DomainEvent[]>
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     findClientes(query: any): Promise<DomainEvent[]> {

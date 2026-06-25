@@ -1,19 +1,19 @@
 import { Request, Response } from "express"
 
-import { CriarCliente } from "../../application/useCases/CriarCliente"
-import { RegistrarDivida } from "../../application/useCases/RegistrarDivida"
-import { RegistrarPagamento } from "../../application/useCases/RegistrarPagamento"
-import { ObterHistorico } from "../../application/useCases/ObterHistorico"
-import { LocalizarClientes } from "../../application/useCases/LocalizarClientes"
+import { CriarCliente } from "../../application/useCases/Cliente/CriarCliente"
+import { RegistrarDivida } from "../../application/useCases/Cliente/RegistrarDivida"
+import { RegistrarPagamento } from "../../application/useCases/Cliente/RegistrarPagamento"
+import { ObterHistorico } from "../../application/useCases/Cliente/ObterHistorico"
+import { LocalizarClientes } from "../../application/useCases/Cliente/LocalizarClientes"
 import { AppError } from "../../shared/errors/AppError"
 import { EventRepository } from "../../domain/repositories/EventRepository"
-import { EmailGateway } from "../../gateways/email.gateways"
+import { EmailService } from "../../domain/repositories/EmailService"
 
 
 export class ClienteController {
   constructor(
     private repository: EventRepository,
-    private emailGateway: EmailGateway
+    private emailGateway: EmailService  
   ) { }
 
   async criarCliente(req: Request, res: Response) {
@@ -153,7 +153,7 @@ export class ClienteController {
 
   }
 
-  async localizarUser(req: Request, res: Response) {
+  async localizarClientes(req: Request, res: Response) {
 
     try {
 
