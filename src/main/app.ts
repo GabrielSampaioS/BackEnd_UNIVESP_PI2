@@ -9,7 +9,7 @@ import authRoute from "../interfaces/routes/authRoutes";
 
 import { EventRepository } from "../domain/repositories/EventRepository";
 import { EmailService } from "../domain/repositories/EmailService";
-import { MongoUserRepository } from "../infrastructure/repositories/MongoUserRepository";
+import { UserRepository } from "../domain/repositories/UserRepository";
 
 // =======================
 // Inicialização do app
@@ -23,7 +23,7 @@ export default function criarApp(
     }: { 
         eventRepository: EventRepository, 
         emailService: EmailService 
-        userRepository: MongoUserRepository
+        userRepository: UserRepository  
     }) {
     
     const app = express();

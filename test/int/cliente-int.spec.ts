@@ -403,7 +403,7 @@ describe("Controller", () => {
             send: mock.fn(() => resSpy)
         };
 
-        await controller.localizarUser(
+        await controller.localizarClientes(
             reqSpy as any,
             resSpy as any
         );

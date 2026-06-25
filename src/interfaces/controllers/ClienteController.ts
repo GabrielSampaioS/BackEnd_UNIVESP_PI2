@@ -7,13 +7,13 @@ import { ObterHistorico } from "../../application/useCases/Cliente/ObterHistoric
 import { LocalizarClientes } from "../../application/useCases/Cliente/LocalizarClientes"
 import { AppError } from "../../shared/errors/AppError"
 import { EventRepository } from "../../domain/repositories/EventRepository"
-import { EmailGateway } from "../../gateways/email.gateways"
+import { EmailService } from "../../domain/repositories/EmailService"
 
 
 export class ClienteController {
   constructor(
     private repository: EventRepository,
-    private emailGateway: EmailGateway
+    private emailGateway: EmailService  
   ) { }
 
   async criarCliente(req: Request, res: Response) {
@@ -153,7 +153,7 @@ export class ClienteController {
 
   }
 
-  async localizarUser(req: Request, res: Response) {
+  async localizarClientes(req: Request, res: Response) {
 
     try {
 

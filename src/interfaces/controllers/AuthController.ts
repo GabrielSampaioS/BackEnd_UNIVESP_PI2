@@ -13,10 +13,8 @@ export class AuthController {
   async register(req: Request, res: Response) {
     try {
 
-      const { email, nome, senha } = req.body
-
       const usecase = new RegisterUser(this.userRepository)
-      
+
       const result = await usecase.execute(req.body)
 
       return res.status(201).json({
@@ -54,6 +52,8 @@ export class AuthController {
       return res.status(200).json({
         message: "Login realizado com sucesso",
         data: {
+          //token: result.token,
+          usuario: result.usuario
 
         }
 

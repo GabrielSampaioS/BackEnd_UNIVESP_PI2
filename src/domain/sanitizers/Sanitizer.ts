@@ -1,5 +1,6 @@
 import { CriarClienteDTO } from "../../application/dto/CriarClienteDTO";
-import { UseDTO } from "../../application/dto/UserDTO";
+import { UserDTO } from "../../application/dto/UserDTO";
+import { AppError } from "../../shared/errors/AppError";
 
 export class Sanitizer {
 
@@ -13,11 +14,15 @@ export class Sanitizer {
         }
     }
 
-    static sanitizarCadastroUser(data: UseDTO): UseDTO {
-        return {
-            nome: data.nome.trim(),
-            email: data.email.trim(),
-            senhaHash: data.senhaHash
-        }
+    static sanitizarCadastroUser(data: UserDTO): UserDTO {
+    if (!data.senhaHash || data.senhaHash.length < 6) {
+        throw new AppError("Senha deve ter no mínimo 6 caracteres", 400, "INVALID_PASSWORD")
     }
+    
+    return {
+        nome: data.nome.trim(),
+        email: data.email.trim(),
+        senhaHash: data.senhaHash
+    }
+}
 }

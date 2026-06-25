@@ -1,5 +1,6 @@
-export interface UseDTO{
-    nome: string,
-    email: string,
+export interface UserDTO { 
+    id?: string
+    nome: string
+    email: string
     senhaHash: string
 }

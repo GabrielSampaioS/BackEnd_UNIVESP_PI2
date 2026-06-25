@@ -33,7 +33,7 @@ export default function clienteRoutes({ eventRepository, emailService }: { event
 
   router.get(
     "/",
-    clienteController.localizarUser.bind(clienteController)
+    clienteController.localizarClientes.bind(clienteController)
   )
   return router;
 }

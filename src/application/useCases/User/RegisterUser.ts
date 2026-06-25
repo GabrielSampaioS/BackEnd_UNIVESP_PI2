@@ -1,6 +1,6 @@
 import { UserRepository } from "../../../domain/repositories/UserRepository";
 import { AppError } from "../../../shared/errors/AppError";
-import { UseDTO } from "../../dto/UserDTO";
+import { UserDTO } from "../../dto/UserDTO";
 import { Sanitizer } from "../../../domain/sanitizers/Sanitizer"
 import { v4 as uuidv4 } from "uuid"
 import { UserEventTypes } from "../../../domain/events/EventTypes";
@@ -10,7 +10,7 @@ export class RegisterUser {
 
     constructor(private userRepository: UserRepository) { }
 
-    async execute(data: UseDTO) {
+    async execute(data: UserDTO) {
         try {
            const dadosLimpos = Sanitizer.sanitizarCadastroUser(data)
            console.log(dadosLimpos)
