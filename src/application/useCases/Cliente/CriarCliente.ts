@@ -5,7 +5,7 @@ import { EmailService } from "../../../domain/repositories/EmailService"
 import { CriarClienteDTO } from "../../dto/CriarClienteDTO"
 import { DomainEvent } from "../../../domain/events/DomainEvent"
 import { AppError } from "../../../shared/errors/AppError"
-import { ClienteSanitizer } from "../../../domain/sanitizers/ClienteSanitizer"
+import { Sanitizer } from "../../../domain/sanitizers/Sanitizer"
 import { ClienteValidador } from "../../../domain/validators/ClienteValidador"
 
 export class CriarCliente {
@@ -14,7 +14,7 @@ export class CriarCliente {
 
     async execute(data: CriarClienteDTO) {
         try {
-            const dadosLimpos = ClienteSanitizer.sanitizarCadastro(data);
+            const dadosLimpos = Sanitizer.sanitizarCadastroCliente(data);
             ClienteValidador.validarCadastro(dadosLimpos);
             
             const aggregate_id = uuidv4();

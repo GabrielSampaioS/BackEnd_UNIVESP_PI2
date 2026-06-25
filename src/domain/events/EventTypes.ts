@@ -8,6 +8,6 @@ export enum ClienteEventTypes {
 
 }
 
-export enum ClienteEventTypes {
+export enum UserEventTypes {
   USUARIO_CADASTRADO = "UsuarioCadastrado",
 }

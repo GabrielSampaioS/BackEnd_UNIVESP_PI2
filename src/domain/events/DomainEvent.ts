@@ -1,4 +1,4 @@
-import { ClienteEventTypes } from "./EventTypes";
+import { ClienteEventTypes, UserEventTypes } from "./EventTypes";
 
 export type DomainEvent =
     | {
@@ -34,6 +34,16 @@ export type DomainEvent =
             valor_pago_cliente: number;
         };
         created_at: Date
-    };
+    }
+    | {
+        aggregate_id: string,
+        event_type: UserEventTypes.USUARIO_CADASTRADO;
+        event_data: {
+            nome: string;
+            email: string;
+            senhaHash: string;
+        },
+        created_at: Date
+    }
 
 

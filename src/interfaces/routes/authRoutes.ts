@@ -8,11 +8,9 @@ export default function authRoute({userRepository} : {userRepository : UserRepos
 
     const authController = new AuthController(userRepository)
 
-    console.log(userRepository)
+    router.post("/register", authController.register.bind(authController))
 
-    router.post("/", authController.register.bind(authController))
-
-    router.post("/", authController.login.bind(authController))
+    router.post("/login", authController.login.bind(authController))
 
     return router;
 }

@@ -12,14 +12,19 @@ export class AuthController {
 
   async register(req: Request, res: Response) {
     try {
-      const usecase = new RegisterUser(this.userRepository)
 
+      const { email, nome, senha } = req.body
+
+      const usecase = new RegisterUser(this.userRepository)
+      
       const result = await usecase.execute(req.body)
 
       return res.status(201).json({
-        message: "Cliente criado",
+        message: "Usuário criado",
         data: {
-
+          id: result.id,
+          nome: result.cliente.nome,
+          email: result.cliente.email,
         }
 
       })
@@ -42,11 +47,12 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       const usecase = new LoginUser(this.userRepository)
+      console.log("teste")
 
       const result = await usecase.execute(req.body)
 
-      return res.status(201).json({
-        message: "Cliente criado",
+      return res.status(200).json({
+        message: "Login realizado com sucesso",
         data: {
 
         }

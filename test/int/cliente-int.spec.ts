@@ -12,9 +12,9 @@ import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import { ClienteController } from "../../src/interfaces/controllers/ClienteController"
 
 // Imports dos Use Cases
-import { CriarCliente } from "../../src/application/useCases/CriarCliente";
-import { RegistrarDivida } from "../../src/application/useCases/RegistrarDivida";
-import { RegistrarPagamento } from "../../src/application/useCases/RegistrarPagamento";
+import { CriarCliente } from "../../src/application/useCases/Cliente/CriarCliente";
+import { RegistrarDivida } from "../../src/application/useCases/Cliente/RegistrarDivida";
+import { RegistrarPagamento } from "../../src/application/useCases/Cliente/RegistrarPagamento";
 
 // Imports do Domínio
 import { FormaPagamento } from "../../src/domain/enums/FormaPagamento";
