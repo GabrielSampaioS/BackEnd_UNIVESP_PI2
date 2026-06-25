@@ -6,8 +6,11 @@ import { UserValidator } from "../../../domain/validators/UserValidador";
 
 
 //TODO: passar a logica de compraação e geração de tokens para outros arquivos
-import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
+
+import { PBKDF2HashService } from "../../../infrastructure/security/PBKDF2HashService"
+
+//TODO: injetart o PBKDF2HashService ao invez der acoplar 
 
 export class LoginUser {
 
@@ -15,6 +18,9 @@ export class LoginUser {
 
     async execute(data: LoginUserDTO) {
         try {
+
+            //TODO desacoplar no futuro
+            const hashService = new PBKDF2HashService()
 
             const dadosLimpos = Sanitizer.sanitizarloginUser(data);
             UserValidator.validateLogin(dadosLimpos)
@@ -24,18 +30,16 @@ export class LoginUser {
                 throw new AppError("Email ou senha incorretos", 401, "INVALID_CREDENTIALS")
             }
 
-            //comparar
-            const senhaValida = await compare(dadosLimpos.senha, usuario.senhaHash)
-            console.log(senhaValida)
-            //if (!senhaValida) {
-              //  throw new AppError("Email ou senha incorretos", 401, "INVALID_CREDENTIALS")
-            //}
+            //Validar senha
+            const senhaValida = await hashService.compare(dadosLimpos.senha, usuario.senhaHash)
+            if (!senhaValida) {
+                throw new AppError("Email ou senha incorretos", 401, "INVALID_CREDENTIALS")
+            }
 
             //gerar token
             const token = sign(
                 {
                     id: usuario.id,
-                    nome: usuario.nome,
                     email: usuario.email
                 },
                 process.env.JWT_SECRET!,
@@ -46,7 +50,13 @@ export class LoginUser {
 
 
             return {
-                token
+                token,
+                usuario: {
+                    id: usuario.id,
+                    nome: usuario.nome,
+                    email: usuario.email
+                }
+
             };
 
 

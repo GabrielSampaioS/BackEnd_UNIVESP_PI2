@@ -6,6 +6,9 @@ import { UserEventTypes } from "../../../domain/events/EventTypes";
 import { DomainEvent } from "../../../domain/events/DomainEvent";
 import { RegisterUserDTO } from "../../dto/RegisterUserDTO";
 import { UserValidator } from "../../../domain/validators/UserValidador";
+import { PBKDF2HashService } from "../../../infrastructure/security/PBKDF2HashService"
+
+//TODO: injetart o PBKDF2HashService ao invez der acoplar 
 
 export class RegisterUser {
 
@@ -14,10 +17,15 @@ export class RegisterUser {
     async execute(data: RegisterUserDTO) {
         try {
 
+            //TODO desacoplar no futuro
+            const hashService = new PBKDF2HashService()
+
             const dadosLimpos = Sanitizer.sanitizarRegisterUser(data)
-            UserValidator.validateRegister(dadosLimpos);
 
             //TODO: validar que email já n estã em utilização
+            UserValidator.validateRegister(dadosLimpos);
+
+            const senhaHash = await hashService.hash(dadosLimpos.senha)
 
             const aggregate_id = uuidv4();
 
@@ -27,7 +35,7 @@ export class RegisterUser {
                 event_data: {
                     nome: dadosLimpos.nome,
                     email: dadosLimpos.email,
-                    senhaHash: dadosLimpos.senha,
+                    senhaHash: senhaHash,
                 },
                 created_at: new Date()
             };
