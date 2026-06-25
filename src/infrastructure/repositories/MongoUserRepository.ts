@@ -11,7 +11,14 @@ export class MongoUserRepository implements UserRepository {
             const doc = new EventModel(event)
             await doc.save()
         } catch (error) {
-            throw new AppError("Erro ao salvar usuário", 500, "DATABASE_ERROR")
+            if (error instanceof AppError) {
+                throw error;
+            }
+            throw new AppError(
+                "Erro ao criar cliente",
+                500,
+                "INTERNAL_SERVER_ERROR"
+            );
         }
     }
 
@@ -39,7 +46,14 @@ export class MongoUserRepository implements UserRepository {
             }
 
         } catch (error) {
-            throw new AppError("Erro ao buscar usuário", 500, "DATABASE_ERROR")
+            if (error instanceof AppError) {
+                throw error;
+            }
+            throw new AppError(
+                "Erro ao criar cliente",
+                500,
+                "INTERNAL_SERVER_ERROR"
+            );
         }
     }
 

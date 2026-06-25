@@ -1,8 +1,6 @@
 import { CriarClienteDTO } from "../../application/dto/CriarClienteDTO";
 import { RegisterUserDTO } from "../../application/dto/RegisterUserDTO";
 import { LoginUserDTO } from "../../application/dto/LoginUserDTO";
-import { AppError } from "../../shared/errors/AppError";
-import { RegisterUser } from "../../application/useCases/User/RegisterUser";
 
 export class Sanitizer {
 
