@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { createAppTest } from "../utils/create-test-app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
+import assert from "node:assert";
+import { getAuthToken } from "../utils/auth";
+
+const { app } = createAppTest()
+let authHeader: string;;
 
 before(async () => {
   await connectDatabase();
@@ -16,16 +21,16 @@ beforeEach(async () => {
     await collections[key].deleteMany({});
   }
 
+  let token = await getAuthToken(app);
+  authHeader = `Bearer ${token}`;
+
 });
 
 after(async () => {
   await mongoose.connection.close();
 });
 
-const { app } = createAppTest()
 
-
-import assert from "node:assert";
 
 describe("POST /clientes/:id/dividas", () => {
 
@@ -34,6 +39,10 @@ describe("POST /clientes/:id/dividas", () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -50,6 +59,10 @@ describe("POST /clientes/:id/dividas", () => {
 
     const responseDivida = await request(app)
       .post(`/clientes/${idCliente}/dividas`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 20,
         descricao: "3 caixa de leite"
@@ -68,6 +81,10 @@ describe("POST /clientes/:id/dividas", () => {
 
     const response = await request(app)
       .post("/clientes/1/dividas")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 20
       })
@@ -84,6 +101,10 @@ describe("POST /clientes/:id/dividas", () => {
 
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -97,6 +118,10 @@ describe("POST /clientes/:id/dividas", () => {
 
     const response = await request(app)
       .post(`/clientes/${idCliente}/dividas`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: -20
       })

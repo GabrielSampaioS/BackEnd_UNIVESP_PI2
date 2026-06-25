@@ -2,28 +2,32 @@ import { before, after, describe, test, beforeEach } from "node:test";
 import mongoose from "mongoose";
 import request from "supertest";
 import { createAppTest } from "../utils/create-test-app";
+import { getAuthToken } from "../utils/auth";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
+
+const { app } = createAppTest()
+let authHeader: string;;
 
 before(async () => {
   await connectDatabase();
 });
 
 beforeEach(async () => {
-
   const collections = mongoose.connection.collections;
 
   for (const key in collections) {
     await collections[key].deleteMany({});
-  }
 
+    let token = await getAuthToken(app);
+    authHeader = `Bearer ${token}`;
+  }
 });
 
 after(async () => {
   await mongoose.connection.close();
 });
 
-const { app } = createAppTest()
 
 describe("GET /clientes/:id/eventos", () => {
 
@@ -32,6 +36,10 @@ describe("GET /clientes/:id/eventos", () => {
     // Cria cliente
     const responseCliente = await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Gabriel",
         sobrenome: "Sampaio",
@@ -46,6 +54,10 @@ describe("GET /clientes/:id/eventos", () => {
     // Registra dívida
     await request(app)
       .post(`/clientes/${idCliente}/dividas`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 100,
         descricao: "2kg de batata"
@@ -55,6 +67,10 @@ describe("GET /clientes/:id/eventos", () => {
     // Registra pagamento
     await request(app)
       .post(`/clientes/${idCliente}/pagamentos`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         valor: 40,
         forma_pagamento: "PIX"
@@ -64,6 +80,10 @@ describe("GET /clientes/:id/eventos", () => {
     // Busca histórico
     const responseHistorico = await request(app)
       .get(`/clientes/${idCliente}/eventos`)
+      .set(
+        "Authorization",
+        authHeader
+      )
       .expect(200);
 
     assert.ok(
@@ -85,14 +105,15 @@ describe("GET /clientes/:id/eventos", () => {
 
     const response = await request(app)
       .get("/clientes/1/eventos")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .expect(404);
 
     assert.strictEqual(
       response.body.type,
       "CLIENT_NOT_FOUND"
     );
-
-
-
   })
 })

@@ -4,6 +4,10 @@ import request from "supertest";
 import { createAppTest } from "../utils/create-test-app";
 import { connectDatabase } from "../../src/infrastructure/database/mongoose";
 import assert from "node:assert";
+import { getAuthToken } from "../utils/auth";
+
+const { app } = createAppTest()
+let authHeader: string;;
 
 before(async () => {
   await connectDatabase();
@@ -11,14 +15,14 @@ before(async () => {
 
 beforeEach(async () => {
   await mongoose.connection.collection("events").deleteMany({})
+
+  let token = await getAuthToken(app);
+  authHeader = `Bearer ${token}`;
 })
 
 after(async () => {
   await mongoose.connection.close();
 });
-
-const { app } = createAppTest()
-
 
 describe("GET /clientes", () => {
 
@@ -28,6 +32,10 @@ describe("GET /clientes", () => {
     // cria cliente para localizar
     await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Guilherme",
         sobrenome: "Sampaio",
@@ -40,6 +48,10 @@ describe("GET /clientes", () => {
     // TESTE: busca cliente
     const response = await request(app)
       .get("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .query({
         nome: "Guilherme"
       })
@@ -61,6 +73,10 @@ describe("GET /clientes", () => {
     // cria cliente para localizar
     await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Guilherme",
         sobrenome: "Sampaio",
@@ -73,6 +89,10 @@ describe("GET /clientes", () => {
     // TESTE: busca cliente
     const response = await request(app)
       .get("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .query({
         cpf: "22407834598"
       })
@@ -98,6 +118,10 @@ describe("GET /clientes", () => {
     // cria cliente para localizar
     await request(app)
       .post("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .send({
         nome: "Guilherme",
         sobrenome: "Sampaio",
@@ -110,6 +134,10 @@ describe("GET /clientes", () => {
     // TESTE: busca cliente
     const response = await request(app)
       .get("/clientes")
+      .set(
+        "Authorization",
+        authHeader
+      )
       .query({
         cpf: "11111111111"
       })
