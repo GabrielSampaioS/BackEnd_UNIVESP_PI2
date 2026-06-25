@@ -41,8 +41,6 @@ jobs:
       - name: Create .env
         run: |
           echo "NODE_ENV=test" >> .env
-          echo "JWT_SECRET=test_secret_jwt_123456789" >> .env
-
 
       - name: Run unit tests
         run: npm run test:unit
@@ -80,7 +78,8 @@ jobs:
         run: |
           echo "NODE_ENV=test" > .env
           echo "MONGO_URI=mongodb://admin:admin@localhost:27017/barDaFiloTest?authSource=admin" >> .env
-
+          echo "JWT_SECRET=test_secret_jwt_123456789" >> .env
+          
       - name: Wait MongoDB
         run: sleep 10
 
