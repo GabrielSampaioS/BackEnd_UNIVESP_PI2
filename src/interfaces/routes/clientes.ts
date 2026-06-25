@@ -12,27 +12,27 @@ export default function clienteRoutes({ eventRepository, emailService }: { event
   const clienteController = new ClienteController(eventRepository, emailService)
 
   router.post(
-    "/clientes",
+    "/",
     clienteController.criarCliente.bind(clienteController)
   )
 
   router.post(
-    "/clientes/:id/dividas",
+    "/:id/dividas",
     clienteController.registrarDivida.bind(clienteController)
   )
 
   router.post(
-    "/clientes/:id/pagamentos",
+    "/:id/pagamentos",
     clienteController.registrarPagamento.bind(clienteController)
   )
 
   router.get(
-    "/clientes/:id/eventos",
+    "/:id/eventos",
     clienteController.obterHistorico.bind(clienteController)
   )
 
   router.get(
-    "/clientes",
+    "/",
     clienteController.localizarUser.bind(clienteController)
   )
   return router;

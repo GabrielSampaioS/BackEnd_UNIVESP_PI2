@@ -5,14 +5,26 @@ import express from "express";
 import cors from "cors";
 
 import clienteRoutes from "../interfaces/routes/clientes";
+import authRoute from "../interfaces/routes/authRoutes";
 
 import { EventRepository } from "../domain/repositories/EventRepository";
 import { EmailService } from "../domain/repositories/EmailService";
+import { MongoUserRepository } from "../infrastructure/repositories/MongoUserRepository";
 
 // =======================
 // Inicialização do app
 // =======================
-export default function criarApp({ eventRepository, emailService }: { eventRepository: EventRepository, emailService: EmailService }) {
+export default function criarApp(
+    { 
+        eventRepository, 
+        emailService,
+        userRepository
+        
+    }: { 
+        eventRepository: EventRepository, 
+        emailService: EmailService 
+        userRepository: MongoUserRepository
+    }) {
     
     const app = express();
 
@@ -23,7 +35,8 @@ export default function criarApp({ eventRepository, emailService }: { eventRepos
     // Importação das rotas
     // =======================
 
-    app.use("/", clienteRoutes({eventRepository, emailService}));
+    app.use("/clientes", clienteRoutes({eventRepository, emailService}));
+    app.use("/auth", authRoute({userRepository}))
 
     return app;
 }

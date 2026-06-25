@@ -5,10 +5,10 @@ export interface EventDocument extends Document {
 
     aggregate_id: string
 
-    event_type: ClienteEventTypes
+    event_type: unknown
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    event_data: any //DomainEvent?
+    event_data: unknown //DomainEvent?
 
     created_at: Date
 
