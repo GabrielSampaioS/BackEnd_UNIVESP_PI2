@@ -1,25 +1,23 @@
 import { UserRepository } from "../../../domain/repositories/UserRepository";
 import { AppError } from "../../../shared/errors/AppError";
-import { UserDTO } from "../../dto/UserDTO";
 import { Sanitizer } from "../../../domain/sanitizers/Sanitizer"
 import { v4 as uuidv4 } from "uuid"
 import { UserEventTypes } from "../../../domain/events/EventTypes";
 import { DomainEvent } from "../../../domain/events/DomainEvent";
+import { RegisterUserDTO } from "../../dto/RegisterUserDTO";
+import { UserValidator } from "../../../domain/validators/UserValidador";
 
 export class RegisterUser {
 
     constructor(private userRepository: UserRepository) { }
 
-    async execute(data: UserDTO) {
+    async execute(data: RegisterUserDTO) {
         try {
-           const dadosLimpos = Sanitizer.sanitizarCadastroUser(data)
-           console.log(dadosLimpos)
 
-            //Estruturar melhor para n ter que recriar todas as class
-            //ClienteValidador.validarCadastro(dadosLimpos);
-            
+            const dadosLimpos = Sanitizer.sanitizarRegisterUser(data)
+            UserValidator.validateRegister(dadosLimpos);
+
             const aggregate_id = uuidv4();
-            console.log(aggregate_id)
 
             const event: DomainEvent = {
                 aggregate_id,
@@ -27,7 +25,7 @@ export class RegisterUser {
                 event_data: {
                     nome: dadosLimpos.nome,
                     email: dadosLimpos.email,
-                    senhaHash: dadosLimpos.senhaHash,
+                    senhaHash: dadosLimpos.senha,
                 },
                 created_at: new Date()
             };
@@ -41,13 +39,13 @@ export class RegisterUser {
                 cliente: dadosLimpos
             };
 
-        } catch(error) {
+        } catch (error) {
             if (error instanceof AppError) {
                 throw error;
-            } 
+            }
             throw new AppError(
                 "Erro ao registar usuário",
-                500,
+                501,
                 "INTERNAL_SERVER_ERROR"
             );
         }

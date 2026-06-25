@@ -45,7 +45,6 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       const usecase = new LoginUser(this.userRepository)
-      console.log("teste")
 
       const result = await usecase.execute(req.body)
 
