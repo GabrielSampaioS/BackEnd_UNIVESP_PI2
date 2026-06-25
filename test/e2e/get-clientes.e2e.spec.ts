@@ -16,7 +16,7 @@ before(async () => {
 beforeEach(async () => {
   await mongoose.connection.collection("events").deleteMany({})
 
-  let token = await getAuthToken(app);
+  const token = await getAuthToken(app);
   authHeader = `Bearer ${token}`;
 })
 

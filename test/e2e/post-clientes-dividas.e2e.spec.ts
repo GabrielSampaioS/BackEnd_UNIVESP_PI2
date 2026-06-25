@@ -21,7 +21,7 @@ beforeEach(async () => {
     await collections[key].deleteMany({});
   }
 
-  let token = await getAuthToken(app);
+  const token = await getAuthToken(app);
   authHeader = `Bearer ${token}`;
 
 });
