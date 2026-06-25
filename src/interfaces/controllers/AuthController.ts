@@ -51,8 +51,7 @@ export class AuthController {
       return res.status(200).json({
         message: "Login realizado com sucesso",
         data: {
-          //token: result.token,
-          usuario: result.usuario
+          token: result.token,
 
         }
 

@@ -14,3 +14,4 @@ export default function authRoute({userRepository} : {userRepository : UserRepos
 
     return router;
 }
+

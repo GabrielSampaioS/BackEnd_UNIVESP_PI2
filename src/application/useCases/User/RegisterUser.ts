@@ -17,6 +17,8 @@ export class RegisterUser {
             const dadosLimpos = Sanitizer.sanitizarRegisterUser(data)
             UserValidator.validateRegister(dadosLimpos);
 
+            //TODO: validar que email já n estã em utilização
+
             const aggregate_id = uuidv4();
 
             const event: DomainEvent = {

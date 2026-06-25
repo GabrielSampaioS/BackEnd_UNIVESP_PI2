@@ -4,10 +4,15 @@ import { ClienteController } from "../controllers/ClienteController"
 import { EventRepository } from "../../domain/repositories/EventRepository"
 import { EmailService } from "../../domain/repositories/EmailService"
 
+//acoplamento 
+import { authMiddleware } from "../../middlewares/MiddlewareAuth"
+
 
 export default function clienteRoutes({ eventRepository, emailService }: { eventRepository: EventRepository, emailService: EmailService }) {
 
   const router = express.Router()
+
+  router.use(authMiddleware)
 
   const clienteController = new ClienteController(eventRepository, emailService)
 
