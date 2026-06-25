@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid"
-import { EventStore } from "../../domain/repositories/EventRepository"
-import { ClienteEventTypes } from "../../domain/events/EventTypes"
-import { EmailService } from "../../domain/repositories/EmailService"
-import { CriarClienteDTO } from "../dto/CriarClienteDTO"
-import { DomainEvent } from "../../domain/events/DomainEvent"
-import { AppError } from "../../shared/errors/AppError"
-import { ClienteSanitizer } from "../../domain/sanitizers/ClienteSanitizer"
-import { ClienteValidador } from "../../domain/validators/ClienteValidador"
+import { EventStore } from "../../../domain/repositories/EventRepository"
+import { ClienteEventTypes } from "../../../domain/events/EventTypes"
+import { EmailService } from "../../../domain/repositories/EmailService"
+import { CriarClienteDTO } from "../../dto/CriarClienteDTO"
+import { DomainEvent } from "../../../domain/events/DomainEvent"
+import { AppError } from "../../../shared/errors/AppError"
+import { ClienteSanitizer } from "../../../domain/sanitizers/ClienteSanitizer"
+import { ClienteValidador } from "../../../domain/validators/ClienteValidador"
 
 export class CriarCliente {
 

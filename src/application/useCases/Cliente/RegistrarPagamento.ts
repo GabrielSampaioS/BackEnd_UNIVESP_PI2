@@ -1,9 +1,9 @@
-import { EventStore } from "../../domain/repositories/EventRepository"
-import { AppError } from "../../shared/errors/AppError";
-import { Cliente } from "../../domain/entities/Cliente";
-import { FormaPagamento } from "../../domain/enums/FormaPagamento";
-import { DomainEvent } from "../../domain/events/DomainEvent";
-import { ClienteEventTypes } from "../../domain/events/EventTypes";
+import { EventStore } from "../../../domain/repositories/EventRepository"
+import { AppError } from "../../../shared/errors/AppError";
+import { Cliente } from "../../../domain/entities/Cliente";
+import { FormaPagamento } from "../../../domain/enums/FormaPagamento";
+import { DomainEvent } from "../../../domain/events/DomainEvent";
+import { ClienteEventTypes } from "../../../domain/events/EventTypes";
 
 export class RegistrarPagamento {
     constructor(private repository: EventStore) { }

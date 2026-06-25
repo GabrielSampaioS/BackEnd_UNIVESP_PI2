@@ -1,8 +1,8 @@
-import { EventStore } from "../../domain/repositories/EventRepository";
-import { Cliente } from "../../domain/entities/Cliente";
-import { AppError } from "../../shared/errors/AppError";
-import { DomainEvent } from "../../domain/events/DomainEvent";
-import { ClienteEventTypes } from "../../domain/events/EventTypes";
+import { EventStore } from "../../../domain/repositories/EventRepository";
+import { Cliente } from "../../../domain/entities/Cliente";
+import { AppError } from "../../../shared/errors/AppError";
+import { DomainEvent } from "../../../domain/events/DomainEvent";
+import { ClienteEventTypes } from "../../../domain/events/EventTypes";
 
 export class RegistrarDivida {
 
