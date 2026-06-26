@@ -5,190 +5,103 @@ import { RegistrarDivida } from "../../application/useCases/Cliente/RegistrarDiv
 import { RegistrarPagamento } from "../../application/useCases/Cliente/RegistrarPagamento"
 import { ObterHistorico } from "../../application/useCases/Cliente/ObterHistorico"
 import { LocalizarClientes } from "../../application/useCases/Cliente/LocalizarClientes"
-import { AppError } from "../../shared/errors/AppError"
 import { EventRepository } from "../../domain/repositories/EventRepository"
 import { EmailService } from "../../domain/repositories/EmailService"
+import { BadRequestError } from "../../middlewares/MiddlewareError"
 
 
 export class ClienteController {
   constructor(
     private repository: EventRepository,
-    private emailGateway: EmailService  
+    private emailGateway: EmailService
   ) { }
 
   async criarCliente(req: Request, res: Response) {
-    try {
-      const usecase = new CriarCliente(this.repository, this.emailGateway)
+    const usecase = new CriarCliente(this.repository, this.emailGateway)
 
-      const result = await usecase.execute(req.body)
+    const result = await usecase.execute(req.body)
 
-      return res.status(201).json({
-        message: "Cliente criado",
-        data: {
-          id: result.id,
-          nome: result.cliente.nome,
-          sobrenome: result.cliente.sobrenome,
-          telefone: result.cliente.telefone,
-          cpf: result.cliente.cpf,
-          email: result.cliente.email
-        }
-
-      })
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
-          message: error.message,
-          type: error.type
-        });
+    return res.status(201).json({
+      message: "Cliente criado",
+      data: {
+        id: result.id,
+        nome: result.cliente.nome,
+        sobrenome: result.cliente.sobrenome,
+        telefone: result.cliente.telefone,
+        cpf: result.cliente.cpf,
+        email: result.cliente.email
       }
 
-      return res.status(500).json({
-        message: "Erro interno do servidor",
-        type: "INTERNAL_SERVER_ERROR"
-      });
-
-    }
-
+    })
   }
 
   async registrarDivida(req: Request, res: Response) {
 
-    try {
-      const { id } = req.params
-      const { valor } = req.body
-      const { descricao } = req.body
+    const { id } = req.params
+    const { valor } = req.body
+    const { descricao } = req.body
 
-      const usecase = new RegistrarDivida(this.repository)
+    const usecase = new RegistrarDivida(this.repository)
 
+    await usecase.execute(id as string, valor, descricao)
 
-      //Cambirra usar "as string" ??
-      await usecase.execute(id as string, valor, descricao)
-
-      return res.status(201).json({
-        message: "Divida registrada",
-        type: "DIVIDA_CRIADA"
-      })
-
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
-          message: error.message,
-          type: error.type
-        });
-      }
-
-      return res.status(500).json({
-        message: "Erro interno do servidor",
-        type: "INTERNAL_SERVER_ERROR"
-      });
-
-    }
+    return res.status(201).json({
+      message: "Divida registrada",
+      type: "DIVIDA_CRIADA"
+    })
 
   }
 
   async registrarPagamento(req: Request, res: Response) {
 
-    try {
-      const { id } = req.params
-      const { valor } = req.body
-      const { forma_pagamento } = req.body
+    const { id } = req.params
+    const { valor } = req.body
+    const { forma_pagamento } = req.body
 
-      const usecase = new RegistrarPagamento(this.repository)
+    const usecase = new RegistrarPagamento(this.repository)
 
-      await usecase.execute(id as string, valor, forma_pagamento)
+    await usecase.execute(id as string, valor, forma_pagamento)
 
-      return res.status(201).json({
-        message: "Pagamento registrado",
-        type: "PAGAMENTO_CRIADO",
-        data: {
-          valor,
-          forma_pagamento
-        }
-
-      })
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
-          message: error.message,
-          type: error.type
-        });
+    return res.status(201).json({
+      message: "Pagamento registrado",
+      type: "PAGAMENTO_CRIADO",
+      data: {
+        valor,
+        forma_pagamento
       }
 
-      return res.status(500).json({
-        message: "Erro interno do servidor",
-        type: "INTERNAL_SERVER_ERROR"
-      });
-
-    }
-
+    })
   }
 
 
   async obterHistorico(req: Request, res: Response) {
 
-    try {
+    const { id } = req.params;
 
-      const { id } = req.params;
+    const usecase = new ObterHistorico(this.repository);
 
-      const usecase = new ObterHistorico(this.repository);
+    const result = await usecase.execute(id as string);
 
-      const result = await usecase.execute(id as string);
+    return res.status(200).json(result);
 
-      return res.status(200).json(result);
-
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
-          message: error.message,
-          type: error.type
-        });
-      }
-
-      return res.status(500).json({
-        message: "Erro interno do servidor",
-        type: "INTERNAL_SERVER_ERROR"
-      });
-
-    }
 
   }
 
   async localizarClientes(req: Request, res: Response) {
+    const { nome, cpf } = req.query as {
+      nome?: string
+      cpf?: string
+    }
 
-    try {
+    const usecase = new LocalizarClientes(this.repository)
 
-      const { nome, cpf } = req.query as {
-        nome?: string
-        cpf?: string
-      }
-
-      const usecase = new LocalizarClientes(this.repository)
-
-      const result = await usecase.execute(nome, cpf)
+    const result = await usecase.execute(nome, cpf)
 
 
-      if (result.length > 0) {
-        return res.status(200).json(result)
-      } else {
-        return res.status(404).json({
-          message: 'Nenhum cliente encontrado',
-          type: 'NOT_FOUND'
-        })
-      }
-
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
-          message: error.message,
-          type: error.type
-        });
-      }
-
-      return res.status(500).json({
-        message: "Erro interno do servidor",
-        type: "INTERNAL_SERVER_ERROR"
-      });
-
+    if (result.length > 0) {
+      return res.status(200).json(result)
+    } else {
+      throw new BadRequestError("Nenhum cliente encontrado", "NOT_FOUND")
     }
 
   }

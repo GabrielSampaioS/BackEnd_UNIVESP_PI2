@@ -11,6 +11,9 @@ import { EventRepository } from "../domain/repositories/EventRepository";
 import { EmailService } from "../domain/repositories/EmailService";
 import { UserRepository } from "../domain/repositories/UserRepository";
 
+import { middlewareError } from "../middlewares/MiddlewareError"
+
+
 // =======================
 // Inicialização do app
 // =======================
@@ -37,6 +40,8 @@ export default function criarApp(
 
     app.use("/clientes", clienteRoutes({eventRepository, emailService}));
     app.use("/auth", authRoute({userRepository}))
+
+    app.use(middlewareError)
 
     return app;
 }

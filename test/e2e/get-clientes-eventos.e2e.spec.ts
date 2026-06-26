@@ -112,7 +112,7 @@ describe("GET /clientes/:id/eventos", () => {
       .expect(404);
 
     assert.strictEqual(
-      response.body.type,
+      response.body.typeError,
       "CLIENT_NOT_FOUND"
     );
   })
