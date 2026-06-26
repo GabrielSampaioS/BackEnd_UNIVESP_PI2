@@ -4,7 +4,6 @@ import { ClienteEventTypes } from "../../../domain/events/EventTypes"
 import { EmailService } from "../../../domain/repositories/EmailService"
 import { CriarClienteDTO } from "../../dto/CriarClienteDTO"
 import { DomainEvent } from "../../../domain/events/DomainEvent"
-import { AppError } from "../../../shared/errors/AppError"
 import { Sanitizer } from "../../../domain/sanitizers/Sanitizer"
 import { ClienteValidador } from "../../../domain/validators/ClienteValidador"
 
@@ -13,48 +12,36 @@ export class CriarCliente {
     constructor(private repository: EventStore, private emailService: EmailService) { }
 
     async execute(data: CriarClienteDTO) {
-        try {
-            const dadosLimpos = Sanitizer.sanitizarCadastroCliente(data);
-            ClienteValidador.validarCadastro(dadosLimpos);
-            
-            const aggregate_id = uuidv4();
+        const dadosLimpos = Sanitizer.sanitizarCadastroCliente(data);
+        ClienteValidador.validarCadastro(dadosLimpos);
 
-            const event: DomainEvent = {
-                aggregate_id,
-                event_type: ClienteEventTypes.CLIENTE_CADASTRADO,
-                event_data: {
-                    nome: dadosLimpos.nome,
-                    sobrenome: dadosLimpos.sobrenome,
-                    telefone: dadosLimpos.telefone,
-                    cpf: dadosLimpos.cpf,
-                    email: dadosLimpos.email
-                },
-                created_at: new Date()
-            };
+        const aggregate_id = uuidv4();
 
-            await this.repository.save(event);
+        const event: DomainEvent = {
+            aggregate_id,
+            event_type: ClienteEventTypes.CLIENTE_CADASTRADO,
+            event_data: {
+                nome: dadosLimpos.nome,
+                sobrenome: dadosLimpos.sobrenome,
+                telefone: dadosLimpos.telefone,
+                cpf: dadosLimpos.cpf,
+                email: dadosLimpos.email
+            },
+            created_at: new Date()
+        };
 
-            this.emailService.sendEmail({
-                remetente: "no-reply@mercado.com",
-                destinatario: event.event_data.email,
-                assunto: "Usuário cadastrado",
-                mensagem: "Recebemos sua solicitação de cadastro"
-            });
+        await this.repository.save(event);
 
-            return {
-                id: aggregate_id,
-                cliente: dadosLimpos
-            };
+        this.emailService.sendEmail({
+            remetente: "no-reply@mercado.com",
+            destinatario: event.event_data.email,
+            assunto: "Usuário cadastrado",
+            mensagem: "Recebemos sua solicitação de cadastro"
+        });
 
-        } catch(error) {
-            if (error instanceof AppError) {
-                throw error;
-            } 
-            throw new AppError(
-                "Erro ao criar cliente",
-                500,
-                "INTERNAL_SERVER_ERROR"
-            );
-        }
+        return {
+            id: aggregate_id,
+            cliente: dadosLimpos
+        };
     }
 }

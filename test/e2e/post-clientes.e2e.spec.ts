@@ -72,14 +72,15 @@ describe("POST /clientes", () => {
       )
       .send({
         nome: "",
-        sobrenome: "",
-        telefone: "",
-        cpf: "",
+        sobrenome: "sampaio",
+        telefone: "111111111",
+        cpf: "12345678998",
         email: "teste@gmail.com.br",
       })
+
       .expect(400).expect((response) => {
-        const codigoErro = response.body.type
-        assert.strictEqual(codigoErro, 'INVALID_DATA')
+        const codigoErro = response.body.typeError
+        assert.equal(codigoErro, 'INVALID_DATA')
       });
     //REsistencia a refatoração: quando um teste continua redistente mesmo apos mudar um detalhe de implementação
 

@@ -142,7 +142,7 @@ describe("GET /clientes", () => {
         cpf: "11111111111"
       })
       .expect(404)
-    const codigoErro = response.body.type
+    const codigoErro = response.body.typeError
     assert.strict(codigoErro, 'NOT_FOUND')
   })
 });

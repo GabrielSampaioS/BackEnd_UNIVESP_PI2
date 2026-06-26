@@ -1,6 +1,6 @@
 
 import { CriarClienteDTO } from "../../application/dto/CriarClienteDTO";
-import { AppError } from "../../shared/errors/AppError";
+import { BadRequestError } from "../../middlewares/MiddlewareError";
 import { FormaPagamento } from "../enums/FormaPagamento";
 
 export class ClienteValidador {
@@ -16,9 +16,8 @@ export class ClienteValidador {
 
         for (const campo of camposObrigatorios) {
             if (!data[campo]) {
-                throw new AppError(
+                throw new BadRequestError(
                     `Campo ${campo} é obrigatório`,
-                    400,
                     "INVALID_DATA"
                 );
             }
@@ -28,9 +27,8 @@ export class ClienteValidador {
 
     static validarDivida(valor: number): void {
         if (valor <= 0) {
-            throw new AppError(
+            throw new BadRequestError(
                 "Valor inválido",
-                400,
                 "INVALID_DATA"
             )
         }
@@ -38,16 +36,14 @@ export class ClienteValidador {
 
     static validarPagamento(valor: number, forma: FormaPagamento): void {
         if (valor < 0) {
-            throw new AppError(
+            throw new BadRequestError(
                 "Valor inválido",
-                400,
                 "INVALID_DATA"
             )
         }
         if (!Object.values(FormaPagamento).includes(forma)) {
-            throw new AppError(
+            throw new BadRequestError(
                 "Forma de pagamento inválida",
-                400,
                 "INVALID_DATA"
             )
         }

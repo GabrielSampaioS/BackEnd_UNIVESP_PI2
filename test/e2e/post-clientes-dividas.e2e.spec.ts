@@ -91,7 +91,7 @@ describe("POST /clientes/:id/dividas", () => {
       .expect(404);
 
     assert.strictEqual(
-      response.body.type,
+      response.body.typeError,
       "CLIENT_NOT_FOUND"
     );
 
@@ -128,7 +128,7 @@ describe("POST /clientes/:id/dividas", () => {
       .expect(400);
 
     assert.strictEqual(
-      response.body.type,
+      response.body.typeError,
       "INVALID_DATA"
     );
 

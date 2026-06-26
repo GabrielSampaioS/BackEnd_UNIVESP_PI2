@@ -1,6 +1,7 @@
 import { UserDTO } from "../../application/dto/UserDTO";
 import { DomainEvent } from "../../domain/events/DomainEvent";
 import { UserRepository } from "../../domain/repositories/UserRepository";
+import { InternalServerError } from "../../middlewares/MiddlewareError";
 import EventModel from "../../models/EventModel"
 import { AppError } from "../../shared/errors/AppError";
 
@@ -14,9 +15,8 @@ export class MongoUserRepository implements UserRepository {
             if (error instanceof AppError) {
                 throw error;
             }
-            throw new AppError(
+            throw new InternalServerError(
                 "Erro ao criar cliente",
-                500,
                 "INTERNAL_SERVER_ERROR"
             );
         }
@@ -49,9 +49,8 @@ export class MongoUserRepository implements UserRepository {
             if (error instanceof AppError) {
                 throw error;
             }
-            throw new AppError(
+            throw new InternalServerError(
                 "Erro ao criar cliente",
-                500,
                 "INTERNAL_SERVER_ERROR"
             );
         }

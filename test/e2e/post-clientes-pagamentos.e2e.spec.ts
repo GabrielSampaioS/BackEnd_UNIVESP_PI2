@@ -195,7 +195,7 @@ describe("POST /clientes/:id/pagamentos", () => {
       .expect(404);
 
     assert.strictEqual(
-      response.body.type,
+      response.body.typeError,
       "CLIENT_NOT_FOUND"
     );
 
@@ -232,7 +232,7 @@ describe("POST /clientes/:id/pagamentos", () => {
       .expect(400);
 
     assert.strictEqual(
-      response.body.type,
+      response.body.typeError,
       "INVALID_DATA"
     );
 
