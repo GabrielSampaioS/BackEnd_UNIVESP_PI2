@@ -1,14 +1,21 @@
-import { NextFunction, Response } from "express";
+import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { AppError } from "../shared/errors/AppError";
 
-export const middlewareError = (
+export const middlewareError: ErrorRequestHandler = (
   error: Error & Partial<AppError>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   req: Request,
   res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ) => {
+
   const statusCode = error.statusCode ?? 500;
-  const msg = error.statusCode ? error.message : "Internal Server Error";
+
+  const msg = error.statusCode
+    ? error.message
+    : "Internal Server Error";
+
   const typeError = error.typeError ?? "INTERNAL_SERVER_ERROR";
 
   return res.status(statusCode).json({
